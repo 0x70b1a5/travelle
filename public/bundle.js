@@ -25507,8 +25507,8 @@
 	          'div',
 	          { className: 'navBtn' },
 	          _react2.default.createElement(
-	            'a',
-	            { target: '_blank', href: '/contact' },
+	            _NavLink2.default,
+	            { to: '/contact' },
 	            'Contact'
 	          )
 	        ),
@@ -25516,8 +25516,8 @@
 	          'div',
 	          { className: 'navBtn' },
 	          _react2.default.createElement(
-	            'a',
-	            { target: '_blank', href: '/support' },
+	            _NavLink2.default,
+	            { to: '/support' },
 	            'Support'
 	          )
 	        )
@@ -25643,14 +25643,14 @@
 	  displayName: 'Home',
 	  getInitialState: function getInitialState() {
 	    return {
-	      headers: ['Date', 'From', 'To', 'Departure', 'Passengers', 'Driver'],
+	      headers: ['From', 'To', 'Departure', 'Passengers', 'Driver', 'Join'],
 	      rows: [{
-	        'date': "",
 	        'from': "",
 	        'to': "",
 	        'departure': "",
 	        'passengers': "",
-	        'driver': ""
+	        'driver': "",
+	        'join': ""
 	      }]
 	    };
 	  },
@@ -27311,12 +27311,12 @@
 	    return _react2.default.createElement(
 	      'tr',
 	      { className: "row" },
-	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.date }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.from }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.to }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.departure }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.passengers }),
-	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.driver })
+	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.driver }),
+	      _react2.default.createElement(_PopupCell2.default, { ride: cols.ride })
 	    );
 	  }
 	});
@@ -27446,6 +27446,7 @@
 
 	    _this.state = {
 	      ride: props.ride,
+	      title: "Join Ride",
 	      data: {
 	        date: 'none',
 	        from: 'none',
@@ -27469,7 +27470,7 @@
 	  }, {
 	    key: 'queryAndShow',
 	    value: function queryAndShow() {
-	      _axios2.default.get('/data/ride/' + this.state.ride).then(function (res) {
+	      _axios2.default.get('/data/' + this.state.ride).then(function (res) {
 	        var data = res.data[0] || this.state.data;
 	        var contents = _react2.default.createElement(
 	          'div',
@@ -27503,6 +27504,16 @@
 	            'p',
 	            null,
 	            'driver: data.driver'
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            null,
+	            'Join this ride?',
+	            _react2.default.createElement(
+	              'button',
+	              null,
+	              'Join'
+	            )
 	          )
 	        );
 	        console.log(contents);
@@ -27539,9 +27550,7 @@
 	        _react2.default.createElement(
 	          _reactSkylight2.default,
 	          {
-	            dialogStyles: _styles2.default.details,
 	            closeButtonStyle: _styles2.default.close,
-	            titleStyle: _styles2.default.title,
 	            ref: 'simpleDialog',
 	            showOverlay: false,
 	            title: this.state.title },

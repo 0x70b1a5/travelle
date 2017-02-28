@@ -12,6 +12,7 @@ class DetailView extends React.Component {
     super(props)
     this.state = {
       ride: props.ride,
+      title: "Join Ride",
       data: {
         date: 'none',
         from: 'none',
@@ -31,7 +32,7 @@ class DetailView extends React.Component {
   }
 
   queryAndShow() {
-    axios.get('/data/ride/'+this.state.ride).then(function(res){
+    axios.get('/data/'+this.state.ride).then(function(res){
       var data = res.data[0] || this.state.data;
       var contents = <div style={{padding: "1em", wordWrap: "break-word"}}>
         <p>date: data.date</p>
@@ -40,6 +41,10 @@ class DetailView extends React.Component {
         <p>to: data.departure</p>
         <p>passengers: data.passengers</p>
         <p>driver: data.driver</p>
+        <div>
+          Join this ride?
+          <button>Join</button>
+        </div>
       </div>
       console.log(contents);
       this.setState({
@@ -60,9 +65,7 @@ class DetailView extends React.Component {
           <button onClick={() => this.queryAndShow()}>view sidebar</button>
         </section>
         <SkyLight
-          dialogStyles={styles.details}
           closeButtonStyle={styles.close}
-          titleStyle={styles.title}
           ref="simpleDialog"
           showOverlay={false}
           title={this.state.title}>

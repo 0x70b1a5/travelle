@@ -10,14 +10,16 @@ export default React.createClass({
       'To',
       'Departure',
       'Passengers',
-      'Driver'
+      'Driver',
+      'Join'
       ],
       rows: [{
         'from': "",
         'to': "",
         'departure': "",
         'passengers': "",
-        'driver': ""
+        'driver': "",
+        'join': ""
       }]
     }
   },

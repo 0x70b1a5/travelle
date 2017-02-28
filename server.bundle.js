@@ -74,13 +74,10 @@
 
 	var _routes2 = _interopRequireDefault(_routes);
 
-	var _serveFavicon = __webpack_require__(25);
-
-	var _serveFavicon2 = _interopRequireDefault(_serveFavicon);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var MongoClient = __webpack_require__(26).MongoClient;
+	// import favicon from 'serve-favicon'
+	var MongoClient = __webpack_require__(25).MongoClient;
 
 	var DB;
 	var app = (0, _express2.default)();
@@ -89,16 +86,16 @@
 	app.use(_express2.default.static(_path2.default.join(__dirname, 'public'), { index: false }));
 	// app.use(favicon(__dirname + 'public/favicon.ico'))
 
-	// send all requests to index.html so browserHistory works
-	app.get('/data/rides/:ride', function (req, res) {
+	app.get('/data/:ride', function (req, res) {
 	  DB.collection('rides').find({ "ride": req.params.ride }).toArray(function (err, rows) {
+	    _assert2.default.equal(err, null);
 	    res.json(rows);
 	  });
 	});
 	app.get('/data/limit/:limit/start/:start', function (req, res) {
 	  var limit = Number(req.params.limit);
 	  var start = Number(req.params.start);
-	  DB.collection('rides').find().sort({ number: 1 }).toArray(function (err, rows) {
+	  DB.collection('rides').find().toArray(function (err, rows) {
 	    res.json(rows.slice(start, limit + start));
 	  });
 	});
@@ -277,8 +274,8 @@
 	          'div',
 	          { className: 'navBtn' },
 	          _react2.default.createElement(
-	            'a',
-	            { target: '_blank', href: '/contact' },
+	            _NavLink2.default,
+	            { to: '/contact' },
 	            'Contact'
 	          )
 	        ),
@@ -286,8 +283,8 @@
 	          'div',
 	          { className: 'navBtn' },
 	          _react2.default.createElement(
-	            'a',
-	            { target: '_blank', href: '/support' },
+	            _NavLink2.default,
+	            { to: '/support' },
 	            'Support'
 	          )
 	        )
@@ -413,14 +410,14 @@
 	  displayName: 'Home',
 	  getInitialState: function getInitialState() {
 	    return {
-	      headers: ['Date', 'From', 'To', 'Departure', 'Passengers', 'Driver'],
+	      headers: ['From', 'To', 'Departure', 'Passengers', 'Driver', 'Join'],
 	      rows: [{
-	        'date': "",
 	        'from': "",
 	        'to': "",
 	        'departure': "",
 	        'passengers': "",
-	        'driver': ""
+	        'driver': "",
+	        'join': ""
 	      }]
 	    };
 	  },
@@ -598,12 +595,12 @@
 	    return _react2.default.createElement(
 	      'tr',
 	      { className: "row" },
-	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.date }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.from }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.to }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.departure }),
 	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.passengers }),
-	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.driver })
+	      _react2.default.createElement(_Cell2.default, { theme: theme + " break-word", data: cols.driver }),
+	      _react2.default.createElement(_PopupCell2.default, { ride: cols.ride })
 	    );
 	  }
 	});
@@ -733,6 +730,7 @@
 
 	    _this.state = {
 	      ride: props.ride,
+	      title: "Join Ride",
 	      data: {
 	        date: 'none',
 	        from: 'none',
@@ -756,7 +754,7 @@
 	  }, {
 	    key: 'queryAndShow',
 	    value: function queryAndShow() {
-	      _axios2.default.get('/data/ride/' + this.state.ride).then(function (res) {
+	      _axios2.default.get('/data/' + this.state.ride).then(function (res) {
 	        var data = res.data[0] || this.state.data;
 	        var contents = _react2.default.createElement(
 	          'div',
@@ -790,6 +788,16 @@
 	            'p',
 	            null,
 	            'driver: data.driver'
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            null,
+	            'Join this ride?',
+	            _react2.default.createElement(
+	              'button',
+	              null,
+	              'Join'
+	            )
 	          )
 	        );
 	        console.log(contents);
@@ -826,9 +834,7 @@
 	        _react2.default.createElement(
 	          _reactSkylight2.default,
 	          {
-	            dialogStyles: _styles2.default.details,
 	            closeButtonStyle: _styles2.default.close,
-	            titleStyle: _styles2.default.title,
 	            ref: 'simpleDialog',
 	            showOverlay: false,
 	            title: this.state.title },
@@ -961,12 +967,6 @@
 
 /***/ },
 /* 25 */
-/***/ function(module, exports) {
-
-	module.exports = require("serve-favicon");
-
-/***/ },
-/* 26 */
 /***/ function(module, exports) {
 
 	module.exports = require("mongodb");

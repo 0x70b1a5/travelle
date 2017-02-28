@@ -6,7 +6,7 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import { match, RouterContext } from 'react-router'
 import routes from './modules/routes'
-import favicon from 'serve-favicon'
+// import favicon from 'serve-favicon'
 const MongoClient = require('mongodb').MongoClient
 
 var DB;
@@ -16,9 +16,9 @@ app.use(compression())
 app.use(express.static(path.join(__dirname, 'public'), {index: false}))
 // app.use(favicon(__dirname + 'public/favicon.ico'))
 
-// send all requests to index.html so browserHistory works
-app.get('/data/rides/:ride', (req,res) => {
-  DB.collection('rides').find({"ride":req.params.ride}).toArray((err, rows) => {
+app.get('/data/:ride', (req,res) => {
+  DB.collection('rides').find({"ride":req.params.ride}).toArray((err, rows) =>{
+    assert.equal(err,null);
     res.json(rows)
   })
 })
@@ -26,7 +26,6 @@ app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)
   var start = Number(req.params.start)
   DB.collection('rides').find()
-    .sort({number:1})
     .toArray((err, rows) => {
       res.json(rows.slice(start,limit+start))
     })
@@ -40,7 +39,7 @@ app.get('*', (req, res) => {
     } else if (props) {
       res.sendFile(path.resolve(__dirname + 'public/index.html'));
     } else if (req.url == '/data'){
-      DB.collection('rides').find().toArray(function(err, rows){
+      DB.collection('rides').find().toArray((err, rows)=>{
         assert.equal(err,null)
         res.json(rows)
       })

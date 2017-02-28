@@ -12,8 +12,8 @@ export default React.createClass({
         </div>
         {this.props.children}
         <div className="nav">
-          <div className="navBtn"><NavLink to="/contact">Contact</NavLink>
-          <div className="navBtn"><NavLink to="/support">Support</NavLink>
+          <div className="navBtn"><NavLink to="/contact">Contact</NavLink></div>
+          <div className="navBtn"><NavLink to="/support">Support</NavLink></div>
         </div>
       </div>
     )
