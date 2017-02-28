@@ -1,0 +1,79 @@
+html {
+  font-family: sans-serif;
+}
+
+#hed {
+  font-size: 3em;
+  font-family: "Montserrat", sans-serif;
+  margin: 1em;
+}
+
+h2 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: normal;
+}
+
+td a {
+  color: inherit;
+}
+
+p a {
+
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+}
+
+.navBtn {
+  padding: 1em;
+}
+
+.navBtn a {
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+}
+
+a.activeNav {
+  color: #f00;
+}
+
+.ride {
+  text-align: left;
+}
+
+.header {
+  font-size: 1.25em;
+}
+
+.cell {
+  text-align: left;
+}
+
+.break-all {
+  word-break: break-all;
+  max-width: 250px;
+}
+
+.break-word {
+  word-break: break-word;
+  max-width: 250px;
+}
+
+button {
+  border: inherit;
+  border-radius: 5px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.paginators {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+
+.rideTable {
+  display: flex;
+  justify-content: center;
+}
