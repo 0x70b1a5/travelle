@@ -1,2 +1,2 @@
 # travelle
-Better carpooling for travelers.
+Better carpooling for travellers.

@@ -199,7 +199,7 @@
 
 	var _Rides2 = _interopRequireDefault(_Rides);
 
-	var _Home = __webpack_require__(13);
+	var _Home = __webpack_require__(24);
 
 	var _Home2 = _interopRequireDefault(_Home);
 
@@ -241,35 +241,56 @@
 	      null,
 	      _react2.default.createElement(
 	        'div',
-	        { id: 'hed' },
-	        'Travelle'
-	      ),
-	      _react2.default.createElement(
-	        'div',
-	        { className: 'nav' },
+	        { className: 'container-fluid' },
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'navBtn' },
+	          { className: 'navbar-header' },
 	          _react2.default.createElement(
-	            _NavLink2.default,
-	            { to: '/', onlyActiveOnIndex: true },
-	            'Home'
+	            'div',
+	            { className: 'navbar-brand' },
+	            'Travelle'
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'navBtn' },
+	          { className: 'navbar-collapse collapse' },
 	          _react2.default.createElement(
-	            _NavLink2.default,
-	            { to: '/about' },
-	            'About'
+	            'ul',
+	            { className: 'nav navbar-nav' },
+	            _react2.default.createElement(
+	              'li',
+	              null,
+	              _react2.default.createElement(
+	                _NavLink2.default,
+	                { to: '/', onlyActiveOnIndex: true },
+	                'Home'
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'li',
+	              null,
+	              _react2.default.createElement(
+	                _NavLink2.default,
+	                { to: '/rides' },
+	                'Rides'
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'li',
+	              null,
+	              _react2.default.createElement(
+	                _NavLink2.default,
+	                { to: '/about' },
+	                'About'
+	              )
+	            )
 	          )
 	        )
 	      ),
 	      this.props.children,
 	      _react2.default.createElement(
 	        'div',
-	        { className: 'nav' },
+	        { className: 'container' },
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'navBtn' },
@@ -361,38 +382,7 @@
 	  value: true
 	});
 
-	var _react = __webpack_require__(5);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = _react2.default.createClass({
-	  displayName: 'Rides',
-	  render: function render() {
-	    return _react2.default.createElement(
-	      'div',
-	      null,
-	      _react2.default.createElement(
-	        'h2',
-	        null,
-	        'Rides'
-	      )
-	    );
-	  }
-	});
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _axios = __webpack_require__(14);
+	var _axios = __webpack_require__(13);
 
 	var _axios2 = _interopRequireDefault(_axios);
 
@@ -400,14 +390,14 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Table = __webpack_require__(15);
+	var _Table = __webpack_require__(14);
 
 	var _Table2 = _interopRequireDefault(_Table);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
-	  displayName: 'Home',
+	  displayName: 'Rides',
 	  getInitialState: function getInitialState() {
 	    return {
 	      headers: ['From', 'To', 'Departure', 'Passengers', 'Driver', 'Join'],
@@ -440,13 +430,13 @@
 	});
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	module.exports = require("axios");
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -459,15 +449,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Row = __webpack_require__(16);
+	var _Row = __webpack_require__(15);
 
 	var _Row2 = _interopRequireDefault(_Row);
 
-	var _HeaderRow = __webpack_require__(24);
+	var _HeaderRow = __webpack_require__(23);
 
 	var _HeaderRow2 = _interopRequireDefault(_HeaderRow);
 
-	var _axios = __webpack_require__(14);
+	var _axios = __webpack_require__(13);
 
 	var _axios2 = _interopRequireDefault(_axios);
 
@@ -564,7 +554,7 @@
 	});
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -577,11 +567,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Cell = __webpack_require__(17);
+	var _Cell = __webpack_require__(16);
 
 	var _Cell2 = _interopRequireDefault(_Cell);
 
-	var _PopupCell = __webpack_require__(18);
+	var _PopupCell = __webpack_require__(17);
 
 	var _PopupCell2 = _interopRequireDefault(_PopupCell);
 
@@ -606,7 +596,7 @@
 	});
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -634,7 +624,7 @@
 	});
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -647,7 +637,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _DetailView = __webpack_require__(19);
+	var _DetailView = __webpack_require__(18);
 
 	var _DetailView2 = _interopRequireDefault(_DetailView);
 
@@ -675,7 +665,7 @@
 	});
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -690,23 +680,23 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactSkylight = __webpack_require__(20);
+	var _reactSkylight = __webpack_require__(19);
 
 	var _reactSkylight2 = _interopRequireDefault(_reactSkylight);
 
-	var _axios = __webpack_require__(14);
+	var _axios = __webpack_require__(13);
 
 	var _axios2 = _interopRequireDefault(_axios);
 
-	var _styles = __webpack_require__(21);
+	var _styles = __webpack_require__(20);
 
 	var _styles2 = _interopRequireDefault(_styles);
 
-	var _reactOnclickoutside = __webpack_require__(22);
+	var _reactOnclickoutside = __webpack_require__(21);
 
 	var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
-	var _utils = __webpack_require__(23);
+	var _utils = __webpack_require__(22);
 
 	var _utils2 = _interopRequireDefault(_utils);
 
@@ -850,13 +840,13 @@
 	exports.default = (0, _reactOnclickoutside2.default)(DetailView);
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports) {
 
 	module.exports = require("react-skylight");
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -903,13 +893,13 @@
 	exports.default = styles;
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = require("react-onclickoutside");
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -931,7 +921,7 @@
 	exports.default = utils;
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -944,7 +934,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Cell = __webpack_require__(17);
+	var _Cell = __webpack_require__(16);
 
 	var _Cell2 = _interopRequireDefault(_Cell);
 
@@ -961,6 +951,101 @@
 	      'tr',
 	      { className: "row" },
 	      cells
+	    );
+	  }
+	});
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: "Home",
+	  render: function render() {
+	    return _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "div",
+	        { className: "jumbotron" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "container" },
+	          _react2.default.createElement(
+	            "h1",
+	            null,
+	            "Travelle"
+	          ),
+	          _react2.default.createElement(
+	            "p",
+	            null,
+	            "Better carpooling for travellers."
+	          ),
+	          _react2.default.createElement(
+	            "a",
+	            { className: "btn btn-primary btn-lg" },
+	            "Book a ride"
+	          ),
+	          _react2.default.createElement(
+	            "a",
+	            { className: "btn btn-lg" },
+	            "Why Travelle?"
+	          )
+	        )
+	      ),
+	      _react2.default.createElement(
+	        "div",
+	        { className: "container" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "row" },
+	          _react2.default.createElement(
+	            "div",
+	            { className: "col-md-6" },
+	            _react2.default.createElement(
+	              "h2",
+	              null,
+	              "Simple and affordable rides to major cities."
+	            )
+	          ),
+	          _react2.default.createElement(
+	            "div",
+	            { className: "col-md-6" },
+	            _react2.default.createElement(
+	              "p",
+	              null,
+	              "We connect drivers with extra space to people who know how to find a deal."
+	            ),
+	            _react2.default.createElement(
+	              "a",
+	              { className: "btn btn-info btn-lg" },
+	              "Get riding"
+	            ),
+	            _react2.default.createElement(
+	              "a",
+	              { className: "btn btn-lg" },
+	              "Apply to drive"
+	            ),
+	            _react2.default.createElement(
+	              "a",
+	              { className: "btn btn-lg" },
+	              "Learn more"
+	            )
+	          )
+	        )
+	      )
 	    );
 	  }
 	});

@@ -1,7 +1,7 @@
 {
   "name": "travelle",
   "version": "1.0.0",
-  "description": "Better carpooling for travelers.",
+  "description": "Better carpooling for travellers.",
   "main": "index.js",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",

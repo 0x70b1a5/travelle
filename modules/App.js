@@ -1,17 +1,14 @@
 import React from 'react'
 import NavLink from './NavLink'
+import NavBar from './NavBar'
 
 export default React.createClass({
   render(){
     return (
       <div>
-        <div id="hed">Travelle</div>
-        <div className="nav">
-          <div className="navBtn"><NavLink to="/" onlyActiveOnIndex>Home</NavLink></div>
-          <div className="navBtn"><NavLink to="/about">About</NavLink></div>
-        </div>
+        <NavBar />
         {this.props.children}
-        <div className="nav">
+        <div className="container">
           <div className="navBtn"><NavLink to="/contact">Contact</NavLink></div>
           <div className="navBtn"><NavLink to="/support">Support</NavLink></div>
         </div>
