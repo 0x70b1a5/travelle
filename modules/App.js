@@ -1,17 +1,16 @@
 import React from 'react'
 import NavLink from './NavLink'
 import NavBar from './NavBar'
+import Footer from './Footer'
 
 export default React.createClass({
   render(){
     return (
       <div>
         <NavBar />
+        <p>&nbsp;</p>
         {this.props.children}
-        <div className="container">
-          <div className="navBtn"><NavLink to="/contact">Contact</NavLink></div>
-          <div className="navBtn"><NavLink to="/support">Support</NavLink></div>
-        </div>
+        <Footer />
       </div>
     )
   }

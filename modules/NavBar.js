@@ -23,7 +23,7 @@ export default React.createClass({
                   <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                       <span className="sr-only">Toggle navigation</span> Menu <i className="fa fa-bars"></i>
                   </button>
-                  <a className="navbar-brand page-scroll" href="#page-top">Travelle</a>
+                  <a className="navbar-brand page-scroll" href="/">Travelle</a>
               </div>
 
               <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

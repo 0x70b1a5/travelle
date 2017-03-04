@@ -9,10 +9,10 @@ body {
   width: 100%;
 }
 body {
-  font-family: 'Merriweather', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 hr {
-  border-color: #F05F40;
+  border-color: #0071bc;
   border-width: 3px;
   max-width: 50px;
 }
@@ -23,7 +23,7 @@ a {
   -webkit-transition: all 0.35s;
   -moz-transition: all 0.35s;
   transition: all 0.35s;
-  color: #F05F40;
+  color: #0071bc;
 }
 a:hover,
 a:focus {
@@ -70,7 +70,7 @@ aside {
   transition: all 0.35s;
 }
 .navbar-default .navbar-header .navbar-brand {
-  color: #F05F40;
+  color: #0071bc;
   font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -94,11 +94,11 @@ aside {
 }
 .navbar-default .nav > li > a:hover,
 .navbar-default .nav > li > a:focus:hover {
-  color: #F05F40;
+  color: #0071bc;
 }
 .navbar-default .nav > li.active > a,
 .navbar-default .nav > li.active > a:focus {
-  color: #F05F40 !important;
+  color: #0071bc !important;
   background-color: transparent;
 }
 .navbar-default .nav > li.active > a:hover,
@@ -130,7 +130,7 @@ aside {
     border-color: rgba(34, 34, 34, 0.05);
   }
   .navbar-default.affix .navbar-header .navbar-brand {
-    color: #F05F40;
+    color: #0071bc;
     font-size: 14px;
   }
   .navbar-default.affix .navbar-header .navbar-brand:hover,
@@ -143,8 +143,14 @@ aside {
   }
   .navbar-default.affix .nav > li > a:hover,
   .navbar-default.affix .nav > li > a:focus:hover {
-    color: #F05F40;
+    color: #0071bc;
   }
+}
+#landing {
+  background-image: url('../img/van_o.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8
 }
 .header {
   position: relative;
@@ -155,9 +161,11 @@ aside {
   background-size: cover;
   -o-background-size: cover;
   background-position: center;
-  background-image: url('../img/header.jpg');
   text-align: center;
   color: white;
+}
+.header-content-inner p {
+  font-weight: 100;
 }
 .header .header-content {
   /*position: relative;*/
@@ -281,7 +289,7 @@ aside {
   margin: 0 auto 20px;
 }
 .text-primary {
-  color: #F05F40;
+  color: #0071bc;
 }
 .no-gutter > [class*='col-'] {
   padding-right: 0;
@@ -337,8 +345,8 @@ fieldset[disabled] .btn-default.active {
 }
 .btn-primary {
   color: white;
-  background-color: #F05F40;
-  border-color: #F05F40;
+  background-color: #0071bc;
+  border-color: #0071bc;
   -webkit-transition: all 0.35s;
   -moz-transition: all 0.35s;
   transition: all 0.35s;
@@ -376,11 +384,11 @@ fieldset[disabled] .btn-primary:active,
 .btn-primary.disabled.active,
 .btn-primary[disabled].active,
 fieldset[disabled] .btn-primary.active {
-  background-color: #F05F40;
-  border-color: #F05F40;
+  background-color: #0071bc;
+  border-color: #0071bc;
 }
 .btn-primary .badge {
-  color: #F05F40;
+  color: #0071bc;
   background-color: white;
 }
 .btn {
@@ -413,4 +421,11 @@ img::-moz-selection {
 }
 body {
   webkit-tap-highlight-color: #222222;
+}
+#homeHeading {
+  font-size: 50px;
+  font-weight: bold;
+}
+.footer * {
+  color: #fff !important;
 }
