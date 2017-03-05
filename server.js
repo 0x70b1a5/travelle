@@ -82,7 +82,7 @@ app.get('/data/:ride', (req,res) => {
     res.json(rows)
   })
 })
-app.get('/auth/user', ensure.ensureLoggedIn(), (req, res) => {
+app.get('/auth/user', (req, res) => {
   res.json(req.user);
 })
 app.get('/data/limit/:limit/start/:start', (req,res) => {
