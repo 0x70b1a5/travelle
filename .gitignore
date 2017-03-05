@@ -58,3 +58,5 @@ typings/
 .env
 
 startbootstrap-creative/
+*.bundle.js
+*/bundle.js
