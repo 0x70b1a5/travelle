@@ -7,18 +7,18 @@ import Drive from './Drive'
 import Home from './Home'
 import Code from './Code'
 import Support from './Support'
-import Jobs from './Jobs'
-import Contact from './Contact'
+import SignIn from './SignIn'
+import Profile from './Profile'
 
 module.exports = (
   <Route path="/" component={App}>
     <IndexRoute component={Home}/>
     <Route path="/rides" component={Rides}/>
     <Route path="/drive" component={Drive}/>
+    <Route path="/login" component={SignIn}/>
     <Route path="/about" component={About}/>
     <Route path="/code" component={Code}/>
-    <Route path="/jobs" component={Jobs}/>
     <Route path="/support" component={Support}/>
-    <Route path="/contact" component={Contact}/>
+    <Route path="/profile" component={Profile}/>
   </Route>
 )

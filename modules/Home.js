@@ -103,46 +103,5 @@ export default React.createClass({
       </section>
     </div>
     )
-    // <div>
-    //   <div className="jumbotron">
-    //     <div className="container">
-    //       <h1>Travelle</h1>
-    //       <p>Better carpooling for travellers.</p>
-    //       <a className="btn btn-primary btn-lg">Book a ride</a>
-    //       <a className="btn btn-lg">Why Travelle?</a>
-    //     </div>
-    //   </div>
-    //   <div className="container">
-    //     <div className="row">
-    //       <div className="col-sm-6">
-    //         <h2>Simple and affordable rides to major cities</h2>
-    //       </div>
-    //       <div className="col-sm-6">
-    //         <p>We connect drivers with extra space to people who know how to find a great deal.</p>
-    //         <a className="btn btn-primary">Get riding</a>
-    //         <a className="btn">Learn more</a>
-    //         <p></p>
-    //         <p>Driving? <a className="btn btn-info">Post a ride</a></p>
-    //       </div>
-    //     </div>
-    //   </div>
-    //   <div className="jumbotron">
-    //     <div className="container">
-    //       <p>We ride local and international</p>
-    //     </div>
-    //   </div>
-    //   <div className="container">
-    //     <div className="row">
-    //       <div className="col-sm-1">
-    //         <span className="icon-lg glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>
-    //       </div>
-    //       <div className="col-sm-4">
-    //         <h2>Environmentally-minded and people-focused</h2>
-    //       </div>
-    //       <div className="col-sm-4">
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
   }
 })

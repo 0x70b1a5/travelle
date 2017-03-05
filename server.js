@@ -8,14 +8,74 @@ import { match, RouterContext } from 'react-router'
 import routes from './modules/routes'
 // import favicon from 'serve-favicon'
 const MongoClient = require('mongodb').MongoClient
+var passport = require('passport')
+var Strategy = require('passport-local').Strategy;
+const session = require('express-session');
+import ensure from 'connect-ensure-login'
+const MongoStore = require('connect-mongo')(session);
 
-var DB;
+
+
+passport.use(new Strategy(
+  function(username, password, cb) {
+    User.findOne({email: username}, function(err, user) {
+      if (err) { return cb(err); }
+      if (!user) { return cb(null, false); }
+      if (user.password != password) { return cb(null, false); }
+      return cb(null, user);
+    });
+  }));
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user.email);
+});
+
+passport.deserializeUser(function(email, cb) {
+  User.findOne({email: email}, function (err, user) {
+    if (err) { return cb(err); }
+    cb(null, user);
+  });
+});
+
+
+var DB, User, Ride;
 const app = express()
 app.use(compression())
-
 app.use(express.static(path.join(__dirname, 'public'), {index: false}))
+app.use(session({
+  secret: 's e c u r i t y',
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoStore({
+    url: 'mongodb://localhost:27017/rides'
+  })
+}));
+app.use(require('body-parser').urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 // app.use(favicon(__dirname + 'public/favicon.ico'))
 
+passport.serializeUser(function(user, done) {
+  done(null, user.email);
+});
+
+passport.deserializeUser(function(email, done) {
+  User.findOne({email: email}, function(err, user) {
+    done(err, user);
+  });
+});
+app.post('/login',
+  passport.authenticate('local', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/profile');
+  });
+app.get('/logout',
+  function(req, res){
+    req.logout();
+    res.redirect('/');
+  });
+app.get('/profile',
+  ensure.ensureLoggedIn());
 app.get('/data/:ride', (req,res) => {
   DB.collection('rides').find({"ride":req.params.ride}).toArray((err, rows) =>{
     assert.equal(err,null);
@@ -56,6 +116,8 @@ MongoClient.connect("mongodb://localhost:27017/rides", (err,db) => {
 
   assert.equal(null,err)
   DB = db;
+  User = db.collection('users');
+  Ride = db.collection('rides');
   console.log("connected to mdb");
 
   app.listen(PORT, function() {
