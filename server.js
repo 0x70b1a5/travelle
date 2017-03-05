@@ -75,7 +75,10 @@ app.get('/logout',
     res.redirect('/');
   });
 app.get('/profile',
-  ensure.ensureLoggedIn());
+  ensure.ensureLoggedIn(),
+  (req,res) => {
+    console.log("USER", req.user);
+  });
 app.get('/data/:ride', (req,res) => {
   DB.collection('rides').find({"ride":req.params.ride}).toArray((err, rows) =>{
     assert.equal(err,null);
