@@ -74,28 +74,95 @@
 
 	var _routes2 = _interopRequireDefault(_routes);
 
+	var _connectEnsureLogin = __webpack_require__(32);
+
+	var _connectEnsureLogin2 = _interopRequireDefault(_connectEnsureLogin);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// import favicon from 'serve-favicon'
-	var MongoClient = __webpack_require__(25).MongoClient;
+	var MongoClient = __webpack_require__(33).MongoClient;
+	var passport = __webpack_require__(34);
+	var Strategy = __webpack_require__(35).Strategy;
+	var session = __webpack_require__(36);
 
-	var DB;
+	var MongoStore = __webpack_require__(37)(session);
+
+	passport.use(new Strategy(function (username, password, cb) {
+	  User.findOne({ email: username }, function (err, user) {
+	    if (err) {
+	      return cb(err);
+	    }
+	    if (!user) {
+	      return cb(null, false);
+	    }
+	    if (user.password != password) {
+	      return cb(null, false);
+	    }
+	    return cb(null, user);
+	  });
+	}));
+
+	passport.serializeUser(function (user, cb) {
+	  cb(null, user.email);
+	});
+
+	passport.deserializeUser(function (email, cb) {
+	  User.findOne({ email: email }, function (err, user) {
+	    if (err) {
+	      return cb(err);
+	    }
+	    cb(null, user);
+	  });
+	});
+
+	var DB, User, Ride;
 	var app = (0, _express2.default)();
 	app.use((0, _compression2.default)());
-
 	app.use(_express2.default.static(_path2.default.join(__dirname, 'public'), { index: false }));
+	app.use(session({
+	  secret: 's e c u r i t y',
+	  resave: false,
+	  saveUninitialized: false,
+	  store: new MongoStore({
+	    url: 'mongodb://localhost:27017/rides'
+	  })
+	}));
+	app.use(__webpack_require__(38).urlencoded({ extended: true }));
+	app.use(passport.initialize());
+	app.use(passport.session());
 	// app.use(favicon(__dirname + 'public/favicon.ico'))
 
+	passport.serializeUser(function (user, done) {
+	  done(null, user.email);
+	});
+
+	passport.deserializeUser(function (email, done) {
+	  User.findOne({ email: email }, function (err, user) {
+	    done(err, user);
+	  });
+	});
+	app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function (req, res) {
+	  res.redirect('/profile');
+	});
+	app.get('/logout', function (req, res) {
+	  req.logout();
+	  res.redirect('/');
+	});
+	app.get('/profile', _connectEnsureLogin2.default.ensureLoggedIn());
 	app.get('/data/:ride', function (req, res) {
-	  DB.collection('rides').find({ "ride": req.params.ride }).toArray(function (err, rows) {
+	  Ride.find({ "ride": req.params.ride }).toArray(function (err, rows) {
 	    _assert2.default.equal(err, null);
 	    res.json(rows);
 	  });
 	});
+	app.get('/auth/user', _connectEnsureLogin2.default.ensureLoggedIn(), function (req, res) {
+	  res.json(req.user);
+	});
 	app.get('/data/limit/:limit/start/:start', function (req, res) {
 	  var limit = Number(req.params.limit);
 	  var start = Number(req.params.start);
-	  DB.collection('rides').find().toArray(function (err, rows) {
+	  Ride.find().toArray(function (err, rows) {
 	    res.json(rows.slice(start, limit + start));
 	  });
 	});
@@ -108,7 +175,7 @@
 	    } else if (props) {
 	      res.sendFile(_path2.default.resolve(__dirname + 'public/index.html'));
 	    } else if (req.url == '/data') {
-	      DB.collection('rides').find().toArray(function (err, rows) {
+	      Ride.find().toArray(function (err, rows) {
 	        _assert2.default.equal(err, null);
 	        res.json(rows);
 	      });
@@ -122,9 +189,10 @@
 	var PORT = process.env.PORT || 8080;
 
 	MongoClient.connect("mongodb://localhost:27017/rides", function (err, db) {
-
 	  _assert2.default.equal(null, err);
 	  DB = db;
+	  User = db.collection('users');
+	  Ride = db.collection('rides');
 	  console.log("connected to mdb");
 
 	  app.listen(PORT, function () {
@@ -191,17 +259,37 @@
 
 	var _App2 = _interopRequireDefault(_App);
 
-	var _About = __webpack_require__(11);
+	var _About = __webpack_require__(13);
 
 	var _About2 = _interopRequireDefault(_About);
 
-	var _Rides = __webpack_require__(12);
+	var _Rides = __webpack_require__(14);
 
 	var _Rides2 = _interopRequireDefault(_Rides);
 
-	var _Home = __webpack_require__(24);
+	var _Drive = __webpack_require__(26);
+
+	var _Drive2 = _interopRequireDefault(_Drive);
+
+	var _Home = __webpack_require__(27);
 
 	var _Home2 = _interopRequireDefault(_Home);
+
+	var _Code = __webpack_require__(28);
+
+	var _Code2 = _interopRequireDefault(_Code);
+
+	var _Support = __webpack_require__(29);
+
+	var _Support2 = _interopRequireDefault(_Support);
+
+	var _SignIn = __webpack_require__(30);
+
+	var _SignIn2 = _interopRequireDefault(_SignIn);
+
+	var _Profile = __webpack_require__(31);
+
+	var _Profile2 = _interopRequireDefault(_Profile);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -210,7 +298,12 @@
 	  { path: '/', component: _App2.default },
 	  _react2.default.createElement(_reactRouter.IndexRoute, { component: _Home2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: '/rides', component: _Rides2.default }),
-	  _react2.default.createElement(_reactRouter.Route, { path: '/about', component: _About2.default })
+	  _react2.default.createElement(_reactRouter.Route, { path: '/drive', component: _Drive2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: '/login', component: _SignIn2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: '/about', component: _About2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: '/code', component: _Code2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: '/support', component: _Support2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: '/profile', component: _Profile2.default })
 	);
 
 /***/ },
@@ -231,6 +324,14 @@
 
 	var _NavLink2 = _interopRequireDefault(_NavLink);
 
+	var _NavBar = __webpack_require__(11);
+
+	var _NavBar2 = _interopRequireDefault(_NavBar);
+
+	var _Footer = __webpack_require__(12);
+
+	var _Footer2 = _interopRequireDefault(_Footer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
@@ -239,77 +340,14 @@
 	    return _react2.default.createElement(
 	      'div',
 	      null,
+	      _react2.default.createElement(_NavBar2.default, null),
 	      _react2.default.createElement(
-	        'div',
-	        { className: 'container-fluid' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'navbar-header' },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'navbar-brand' },
-	            'Travelle'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'navbar-collapse collapse' },
-	          _react2.default.createElement(
-	            'ul',
-	            { className: 'nav navbar-nav' },
-	            _react2.default.createElement(
-	              'li',
-	              null,
-	              _react2.default.createElement(
-	                _NavLink2.default,
-	                { to: '/', onlyActiveOnIndex: true },
-	                'Home'
-	              )
-	            ),
-	            _react2.default.createElement(
-	              'li',
-	              null,
-	              _react2.default.createElement(
-	                _NavLink2.default,
-	                { to: '/rides' },
-	                'Rides'
-	              )
-	            ),
-	            _react2.default.createElement(
-	              'li',
-	              null,
-	              _react2.default.createElement(
-	                _NavLink2.default,
-	                { to: '/about' },
-	                'About'
-	              )
-	            )
-	          )
-	        )
+	        'p',
+	        null,
+	        '\xA0'
 	      ),
 	      this.props.children,
-	      _react2.default.createElement(
-	        'div',
-	        { className: 'container' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'navBtn' },
-	          _react2.default.createElement(
-	            _NavLink2.default,
-	            { to: '/contact' },
-	            'Contact'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'navBtn' },
-	          _react2.default.createElement(
-	            _NavLink2.default,
-	            { to: '/support' },
-	            'Support'
-	          )
-	        )
-	      )
+	      _react2.default.createElement(_Footer2.default, null)
 	    );
 	  }
 	});
@@ -355,6 +393,259 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _NavLink = __webpack_require__(10);
+
+	var _NavLink2 = _interopRequireDefault(_NavLink);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'NavBar',
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'nav',
+	        { id: 'mainNav', className: 'navbar navbar-default navbar-fixed-top' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'container-fluid bg-primary' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'navbar-header' },
+	            _react2.default.createElement(
+	              'button',
+	              { type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#bs-example-navbar-collapse-1' },
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'sr-only' },
+	                'Toggle navigation'
+	              ),
+	              ' Menu ',
+	              _react2.default.createElement('i', { className: 'fa fa-bars' })
+	            ),
+	            _react2.default.createElement(
+	              'a',
+	              { className: 'navbar-brand page-scroll', href: '/' },
+	              'Travelle'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
+	            _react2.default.createElement(
+	              'ul',
+	              { className: 'nav navbar-nav navbar-right' },
+	              _react2.default.createElement(
+	                'li',
+	                null,
+	                _react2.default.createElement(
+	                  _NavLink2.default,
+	                  { to: '/about' },
+	                  'About'
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'li',
+	                null,
+	                _react2.default.createElement(
+	                  _NavLink2.default,
+	                  { to: '/rides' },
+	                  'Ride'
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'li',
+	                null,
+	                _react2.default.createElement(
+	                  _NavLink2.default,
+	                  { to: '/drive' },
+	                  'Drive'
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'li',
+	                null,
+	                _react2.default.createElement(
+	                  _NavLink2.default,
+	                  { to: '/login' },
+	                  'Sign in'
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'li',
+	                null,
+	                _react2.default.createElement(
+	                  _NavLink2.default,
+	                  { to: '/register' },
+	                  'Sign up'
+	                )
+	              )
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: "Footer",
+	  render: function render() {
+	    return _react2.default.createElement(
+	      "section",
+	      { className: "bg-dark footer" },
+	      _react2.default.createElement(
+	        "div",
+	        { className: "container" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "row" },
+	          _react2.default.createElement(
+	            "div",
+	            { className: "col-md-4" },
+	            _react2.default.createElement(
+	              "h4",
+	              null,
+	              "Get in Touch"
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "mailto:hello@travelle.com" },
+	                "Contact Us"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "/support" },
+	                "Support"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "mailto:hello@travelle.com" },
+	                "Feedback"
+	              )
+	            )
+	          ),
+	          _react2.default.createElement(
+	            "div",
+	            { className: "col-md-4" },
+	            _react2.default.createElement(
+	              "h4",
+	              null,
+	              "More Information"
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "/team" },
+	                "Our Team"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "/jobs" },
+	                "Apply to Work at Travelle"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "/tos" },
+	                "Legal"
+	              )
+	            )
+	          ),
+	          _react2.default.createElement(
+	            "div",
+	            { className: "col-md-4" },
+	            _react2.default.createElement(
+	              "h4",
+	              null,
+	              "Social"
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "//twitter.com" },
+	                "Twitter"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "//twitter.com" },
+	                "Facebook"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "li",
+	              null,
+	              _react2.default.createElement(
+	                "a",
+	                { href: "//twitter.com" },
+	                "Instagram"
+	              )
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
@@ -373,7 +664,7 @@
 	});
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -382,7 +673,7 @@
 	  value: true
 	});
 
-	var _axios = __webpack_require__(13);
+	var _axios = __webpack_require__(15);
 
 	var _axios2 = _interopRequireDefault(_axios);
 
@@ -390,7 +681,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Table = __webpack_require__(14);
+	var _Table = __webpack_require__(16);
 
 	var _Table2 = _interopRequireDefault(_Table);
 
@@ -430,13 +721,13 @@
 	});
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = require("axios");
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -449,15 +740,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Row = __webpack_require__(15);
+	var _Row = __webpack_require__(17);
 
 	var _Row2 = _interopRequireDefault(_Row);
 
-	var _HeaderRow = __webpack_require__(23);
+	var _HeaderRow = __webpack_require__(25);
 
 	var _HeaderRow2 = _interopRequireDefault(_HeaderRow);
 
-	var _axios = __webpack_require__(13);
+	var _axios = __webpack_require__(15);
 
 	var _axios2 = _interopRequireDefault(_axios);
 
@@ -554,7 +845,7 @@
 	});
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -567,11 +858,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Cell = __webpack_require__(16);
+	var _Cell = __webpack_require__(18);
 
 	var _Cell2 = _interopRequireDefault(_Cell);
 
-	var _PopupCell = __webpack_require__(17);
+	var _PopupCell = __webpack_require__(19);
 
 	var _PopupCell2 = _interopRequireDefault(_PopupCell);
 
@@ -596,7 +887,7 @@
 	});
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -624,7 +915,7 @@
 	});
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -637,7 +928,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _DetailView = __webpack_require__(18);
+	var _DetailView = __webpack_require__(20);
 
 	var _DetailView2 = _interopRequireDefault(_DetailView);
 
@@ -665,7 +956,7 @@
 	});
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -680,23 +971,23 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactSkylight = __webpack_require__(19);
+	var _reactSkylight = __webpack_require__(21);
 
 	var _reactSkylight2 = _interopRequireDefault(_reactSkylight);
 
-	var _axios = __webpack_require__(13);
+	var _axios = __webpack_require__(15);
 
 	var _axios2 = _interopRequireDefault(_axios);
 
-	var _styles = __webpack_require__(20);
+	var _styles = __webpack_require__(22);
 
 	var _styles2 = _interopRequireDefault(_styles);
 
-	var _reactOnclickoutside = __webpack_require__(21);
+	var _reactOnclickoutside = __webpack_require__(23);
 
 	var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
-	var _utils = __webpack_require__(22);
+	var _utils = __webpack_require__(24);
 
 	var _utils2 = _interopRequireDefault(_utils);
 
@@ -840,13 +1131,13 @@
 	exports.default = (0, _reactOnclickoutside2.default)(DetailView);
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = require("react-skylight");
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -893,13 +1184,13 @@
 	exports.default = styles;
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = require("react-onclickoutside");
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -921,7 +1212,7 @@
 	exports.default = utils;
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -934,7 +1225,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Cell = __webpack_require__(16);
+	var _Cell = __webpack_require__(18);
 
 	var _Cell2 = _interopRequireDefault(_Cell);
 
@@ -956,7 +1247,7 @@
 	});
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -972,39 +1263,511 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = _react2.default.createClass({
-	  displayName: "Home",
+	  displayName: "Drive",
 	  render: function render() {
 	    return _react2.default.createElement(
 	      "div",
 	      null,
+	      _react2.default.createElement("br", null),
 	      _react2.default.createElement(
 	        "div",
-	        { className: "jumbotron" },
+	        { className: "col-md-9" },
+	        _react2.default.createElement(
+	          "h1",
+	          null,
+	          " Post a Ride "
+	        )
+	      ),
+	      _react2.default.createElement(
+	        "section",
+	        null,
 	        _react2.default.createElement(
 	          "div",
 	          { className: "container" },
 	          _react2.default.createElement(
-	            "h1",
-	            null,
-	            "Travelle"
-	          ),
-	          _react2.default.createElement(
-	            "p",
-	            null,
-	            "Better carpooling for travellers."
-	          ),
-	          _react2.default.createElement(
-	            "a",
-	            { className: "btn btn-primary btn-lg" },
-	            "Book a ride"
-	          ),
-	          _react2.default.createElement(
-	            "a",
-	            { className: "btn btn-lg" },
-	            "Why Travelle?"
+	            "div",
+	            { className: "row" },
+	            _react2.default.createElement("div", { className: "col-md-2" }),
+	            _react2.default.createElement(
+	              "div",
+	              { className: "col-md-4" },
+	              _react2.default.createElement(
+	                "p",
+	                { className: "text-center" },
+	                _react2.default.createElement(
+	                  "i",
+	                  { className: "fa fa-5x text-primary sr-icons" },
+	                  "\uD83D\uDE97"
+	                )
+	              ),
+	              "Thanks for choosing to drive with Travelle. Please note all drivers are expected to abide by our ",
+	              _react2.default.createElement(
+	                "a",
+	                { href: "/code" },
+	                "Code of Conduct"
+	              ),
+	              " while traveling with riders."
+	            ),
+	            _react2.default.createElement(
+	              "div",
+	              { className: "col-md-4" },
+	              _react2.default.createElement(
+	                "form",
+	                null,
+	                _react2.default.createElement(
+	                  "div",
+	                  { className: "form-group" },
+	                  _react2.default.createElement(
+	                    "label",
+	                    { htmlFor: "driver-email" },
+	                    "Email address"
+	                  ),
+	                  _react2.default.createElement("input", { type: "email", className: "form-control", id: "driver-email", placeholder: "Email" })
+	                ),
+	                _react2.default.createElement(
+	                  "div",
+	                  { className: "form-group" },
+	                  _react2.default.createElement(
+	                    "label",
+	                    { htmlFor: "" },
+	                    "Password"
+	                  ),
+	                  _react2.default.createElement("input", { type: "password", className: "form-control", id: "", placeholder: "Password" })
+	                ),
+	                "City:",
+	                _react2.default.createElement(
+	                  "select",
+	                  { className: "form-control" },
+	                  _react2.default.createElement(
+	                    "option",
+	                    null,
+	                    "Montreal"
+	                  ),
+	                  _react2.default.createElement(
+	                    "option",
+	                    null,
+	                    "Toronto"
+	                  ),
+	                  _react2.default.createElement(
+	                    "option",
+	                    null,
+	                    "Quebec City"
+	                  ),
+	                  _react2.default.createElement(
+	                    "option",
+	                    null,
+	                    "New York City"
+	                  ),
+	                  _react2.default.createElement(
+	                    "option",
+	                    null,
+	                    "Calgary"
+	                  )
+	                ),
+	                _react2.default.createElement(
+	                  "div",
+	                  { className: "checkbox" },
+	                  _react2.default.createElement(
+	                    "label",
+	                    null,
+	                    _react2.default.createElement("input", { type: "checkbox" }),
+	                    " Check me out"
+	                  )
+	                ),
+	                _react2.default.createElement(
+	                  "button",
+	                  { type: "submit", className: "btn btn-default" },
+	                  "Submit"
+	                )
+	              )
+	            ),
+	            _react2.default.createElement("div", { className: "col-md-2" })
 	          )
 	        )
-	      ),
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	    displayName: "Home",
+	    render: function render() {
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(
+	                "section",
+	                { id: "landing", className: "text-center bg-dark" },
+	                _react2.default.createElement(
+	                    "header",
+	                    null,
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        "\xA0"
+	                    ),
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        "\xA0"
+	                    ),
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        "\xA0"
+	                    ),
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "header-content" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "header-content-inner" },
+	                            _react2.default.createElement(
+	                                "h1",
+	                                { id: "homeHeading" },
+	                                "Travelle"
+	                            ),
+	                            _react2.default.createElement("hr", null),
+	                            _react2.default.createElement(
+	                                "p",
+	                                null,
+	                                "Better carpooling for travelers."
+	                            ),
+	                            _react2.default.createElement(
+	                                "a",
+	                                { href: "#about", className: "btn btn-primary btn-xl page-scroll" },
+	                                "Find Out More"
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        "\xA0"
+	                    ),
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        "\xA0"
+	                    ),
+	                    _react2.default.createElement(
+	                        "p",
+	                        null,
+	                        "\xA0"
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement(
+	                "section",
+	                { id: "services" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "container" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "row" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-lg-12 text-center" },
+	                            _react2.default.createElement(
+	                                "h2",
+	                                { className: "section-heading" },
+	                                "Why ride with Travelle?"
+	                            ),
+	                            _react2.default.createElement("hr", { className: "primary" })
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "container" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "row" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-md-4 text-center" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "service-box" },
+	                                _react2.default.createElement(
+	                                    "i",
+	                                    { className: "fa fa-5x text-primary sr-icons" },
+	                                    "\uD83D\uDE97"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "h3",
+	                                    null,
+	                                    "Go anywhere"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "p",
+	                                    { className: "text-muted" },
+	                                    "Our drivers live all across the country, so you're never searching for long."
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-md-4 text-center" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "service-box" },
+	                                _react2.default.createElement(
+	                                    "i",
+	                                    { className: "fa fa-5x text-primary sr-icons" },
+	                                    "\uD83C\uDFC3"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "h3",
+	                                    null,
+	                                    "Relax on the road"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "p",
+	                                    { className: "text-muted" },
+	                                    "We make sure our riders and drivers follow our ",
+	                                    _react2.default.createElement(
+	                                        "a",
+	                                        { href: "/code" },
+	                                        "Code of Conduct"
+	                                    ),
+	                                    "."
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-md-4 text-center" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "service-box" },
+	                                _react2.default.createElement(
+	                                    "i",
+	                                    { className: "fa fa-5x text-primary sr-icons" },
+	                                    "\uD83D\uDCB0"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "h3",
+	                                    null,
+	                                    "Budget-friendly"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "p",
+	                                    { className: "text-muted" },
+	                                    "We know travellers love to save, and we've built our business to match."
+	                                )
+	                            )
+	                        )
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement(
+	                "section",
+	                { className: "bg-primary", id: "about" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "container" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "row" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-lg-8 col-lg-offset-2 text-center" },
+	                            _react2.default.createElement(
+	                                "h2",
+	                                { className: "section-heading" },
+	                                "Simple and affordable rides from one city to the next."
+	                            ),
+	                            _react2.default.createElement("hr", { className: "light" }),
+	                            _react2.default.createElement(
+	                                "p",
+	                                { className: "text-faded" },
+	                                "Book a ride with us in three clicks. Get riding today."
+	                            ),
+	                            _react2.default.createElement(
+	                                "a",
+	                                { href: "#services", className: "page-scroll btn btn-default btn-xl sr-button" },
+	                                "Book a ride"
+	                            )
+	                        )
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement(
+	                "aside",
+	                { className: "bg-dark" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "container text-center" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "call-to-action" },
+	                        _react2.default.createElement(
+	                            "h2",
+	                            null,
+	                            "Rather drive?"
+	                        ),
+	                        _react2.default.createElement("hr", { className: "light" }),
+	                        _react2.default.createElement(
+	                            "p",
+	                            { className: "text-faded" },
+	                            "You're the wheels that make our world spin round. If you've got two or more seats and love feeling the rubber hit the road, we'd love to have you with us."
+	                        ),
+	                        _react2.default.createElement(
+	                            "a",
+	                            { href: "/drive", className: "btn btn-primary btn-xl sr-button" },
+	                            "Sign up to drive"
+	                        )
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement(
+	                "section",
+	                { id: "contact" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "container" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "row" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-lg-8 col-lg-offset-2 text-center" },
+	                            _react2.default.createElement(
+	                                "h2",
+	                                { className: "section-heading" },
+	                                "Let's Get In Touch!"
+	                            ),
+	                            _react2.default.createElement(
+	                                "p",
+	                                null,
+	                                "Do you have an idea that could help us be even better? We're always happy to talk to users and lovers of travel. Drop us a line:"
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-lg-4 col-lg-offset-2 text-center" },
+	                            _react2.default.createElement("i", { className: "fa fa-phone fa-3x sr-contact" }),
+	                            _react2.default.createElement(
+	                                "p",
+	                                null,
+	                                "123-456-6789"
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "col-lg-4 text-center" },
+	                            _react2.default.createElement("i", { className: "fa fa-envelope-o fa-3x sr-contact" }),
+	                            _react2.default.createElement(
+	                                "p",
+	                                null,
+	                                _react2.default.createElement(
+	                                    "a",
+	                                    { href: "mailto:contact@travelle.com" },
+	                                    "contact@travelle.com"
+	                                )
+	                            )
+	                        )
+	                    )
+	                )
+	            )
+	        );
+	    }
+	});
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'Code',
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      'Drivin'
+	    );
+	  }
+	});
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'Support',
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      'Drivin'
+	    );
+	  }
+	});
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: "SignIn",
+	  render: function render() {
+	    return _react2.default.createElement(
+	      "section",
+	      null,
 	      _react2.default.createElement(
 	        "div",
 	        { className: "container" },
@@ -1013,35 +1776,44 @@
 	          { className: "row" },
 	          _react2.default.createElement(
 	            "div",
-	            { className: "col-md-6" },
+	            { className: "col-md-4" },
 	            _react2.default.createElement(
-	              "h2",
-	              null,
-	              "Simple and affordable rides to major cities."
-	            )
-	          ),
-	          _react2.default.createElement(
-	            "div",
-	            { className: "col-md-6" },
-	            _react2.default.createElement(
-	              "p",
-	              null,
-	              "We connect drivers with extra space to people who know how to find a deal."
+	              "form",
+	              { className: "form-signin", action: "/login", method: "post" },
+	              _react2.default.createElement(
+	                "h2",
+	                { className: "form-signin-heading" },
+	                "Please sign in"
+	              ),
+	              _react2.default.createElement(
+	                "label",
+	                { htmlFor: "inputEmail", className: "sr-only" },
+	                "Email address"
+	              ),
+	              _react2.default.createElement("input", { name: "username", type: "email", id: "inputEmail", className: "form-control", placeholder: "Email address", required: "", autofocus: "", autoComplete: "off" }),
+	              _react2.default.createElement(
+	                "label",
+	                { htmlFor: "inputPassword", className: "sr-only" },
+	                "Password"
+	              ),
+	              _react2.default.createElement("input", { name: "password", type: "password", id: "inputPassword", className: "form-control", placeholder: "Password", required: "", autoComplete: "off" }),
+	              _react2.default.createElement(
+	                "div",
+	                { className: "checkbox" },
+	                _react2.default.createElement(
+	                  "label",
+	                  null,
+	                  _react2.default.createElement("input", { type: "checkbox", value: "remember-me" }),
+	                  " Remember me"
+	                )
+	              ),
+	              _react2.default.createElement("input", { className: "btn btn-lg btn-primary btn-block", value: "Sign In", type: "submit" })
 	            ),
+	            "Don't have an account? ",
 	            _react2.default.createElement(
 	              "a",
-	              { className: "btn btn-info btn-lg" },
-	              "Get riding"
-	            ),
-	            _react2.default.createElement(
-	              "a",
-	              { className: "btn btn-lg" },
-	              "Apply to drive"
-	            ),
-	            _react2.default.createElement(
-	              "a",
-	              { className: "btn btn-lg" },
-	              "Learn more"
+	              { href: "/register" },
+	              "Register"
 	            )
 	          )
 	        )
@@ -1051,10 +1823,96 @@
 	});
 
 /***/ },
-/* 25 */
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(5);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _axios = __webpack_require__(15);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	  displayName: 'Profile',
+	  getInitialState: function getInitialState() {
+	    return {
+	      user: "Nobody"
+	    };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+
+	    _axios2.default.get('/auth/user').then(function (res) {
+	      console.log("res", res);
+	      _this.setState({
+	        user: res.data
+	      });
+	    });
+	  },
+	  render: function render() {
+	    return _react2.default.createElement(
+	      'section',
+	      null,
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'container' },
+	        this.state.user.email
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	module.exports = require("connect-ensure-login");
+
+/***/ },
+/* 33 */
 /***/ function(module, exports) {
 
 	module.exports = require("mongodb");
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	module.exports = require("passport");
+
+/***/ },
+/* 35 */
+/***/ function(module, exports) {
+
+	module.exports = require("passport-local");
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	module.exports = require("express-session");
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+	module.exports = require("connect-mongo");
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	module.exports = require("body-parser");
 
 /***/ }
 /******/ ]);

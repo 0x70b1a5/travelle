@@ -75,20 +75,20 @@ app.get('/logout',
     res.redirect('/');
   });
 app.get('/profile',
-  ensure.ensureLoggedIn(),
-  (req,res) => {
-    console.log("USER", req.user);
-  });
+  ensure.ensureLoggedIn());
 app.get('/data/:ride', (req,res) => {
-  DB.collection('rides').find({"ride":req.params.ride}).toArray((err, rows) =>{
+  Ride.find({"ride":req.params.ride}).toArray((err, rows) =>{
     assert.equal(err,null);
     res.json(rows)
   })
 })
+app.get('/auth/user', ensure.ensureLoggedIn(), (req, res) => {
+  res.json(req.user);
+})
 app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)
   var start = Number(req.params.start)
-  DB.collection('rides').find()
+  Ride.find()
     .toArray((err, rows) => {
       res.json(rows.slice(start,limit+start))
     })
@@ -102,7 +102,7 @@ app.get('*', (req, res) => {
     } else if (props) {
       res.sendFile(path.resolve(__dirname + 'public/index.html'));
     } else if (req.url == '/data'){
-      DB.collection('rides').find().toArray((err, rows)=>{
+      Ride.find().toArray((err, rows)=>{
         assert.equal(err,null)
         res.json(rows)
       })
@@ -116,7 +116,6 @@ app.get('*', (req, res) => {
 var PORT = process.env.PORT || 8080
 
 MongoClient.connect("mongodb://localhost:27017/rides", (err,db) => {
-
   assert.equal(null,err)
   DB = db;
   User = db.collection('users');
