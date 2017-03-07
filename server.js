@@ -15,6 +15,7 @@ const session = require('express-session');
 import ensure from 'connect-ensure-login'
 const MongoStore = require('connect-mongo')(session);
 import bcrypt from 'bcrypt'
+import nodemailer from 'nodemailer'
 
 
 passport.use(new Strategy({
@@ -59,16 +60,24 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 // app.use(favicon(__dirname + 'public/favicon.ico'))
-
 passport.serializeUser(function(user, done) {
   done(null, user.email);
 });
-
 passport.deserializeUser(function(email, done) {
   User.findOne({email: email}, function(err, user) {
     done(err, user);
   });
 });
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.NODEMAILER_EMAIL,
+    pass: process.env.NODEMAILER_PASS
+  }
+});
+
+
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),
   function(req, res) {
@@ -76,12 +85,31 @@ app.post('/login',
   });
 app.post('/register', (req, res) => {
   if (utils.user.valid(req.body)) {
-    var hash = bcrypt.hashSync(req.body.password, 10);
-    User.insertOne({
+    var hash = bcrypt.hashSync(req.body.password, 10),
+    newUser = {
+      name: req.body.name,
       email: req.body.email,
       password: hash,
       status: req.body.status
+    };
+    console.log(newUser);
+    if (newUser.status == '0') { // 0 => rider, 1 => driver
+      // we're good
+    } else if (newUser.status == '1') {
+      newUser.car = req.body.car;
+      newUser.plate = req.body.plate;
+    } else {
+      console.log(`BadUserInfoException: User status is invalid: ${newUser}`);
+      res.redirect('/register');
+      return;
+    }
+    // create user in DB
+    User.insertOne(newUser, (err, rows) => {
+      assert.equal(err, null)
     });
+    // send registration email
+    let mailOptions = utils.mail.newUser(req.body.email);
+    utils.mail.send(transporter, mailOptions);
     res.redirect('/login')
   } else {
     res.redirect('/register')
@@ -92,16 +120,42 @@ app.get('/logout',
     req.logout();
     res.redirect('/');
   });
-app.get('/profile',
-  ensure.ensureLoggedIn());
-app.get('/data/:ride', (req,res) => {
-  Ride.find({"ride":req.params.ride}).toArray((err, rows) =>{
+app.get('/profile', ensure.ensureLoggedIn());
+app.get('/data/:id', (req,res) => {
+  Ride.find({"id":req.params.id}).toArray((err, rows) =>{
     assert.equal(err,null);
-    res.json(rows)
+    res.json(rows);
   })
 })
-app.get('/auth/user', (req, res) => {
+app.get('/auth/user', (req, res) => { // returns current user or null
   res.json(req.user);
+})
+app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
+  var ride = req.body;
+  if (!utils.user.isDriver(req.user) ||
+    !utils.ride.valid(ride)
+  ) {
+    console.log(req);
+    res.redirect('/post');
+    return;
+  }
+  ride.driver = req.user.name;
+  ride.passengers = 0;
+  Ride.find().toArray((err, all) => {
+    assert.equal(err, null);
+    ride.id = String(all.length);
+    Ride.insertOne(ride, (err, rows) => {
+      assert.equal(err, null);
+    });
+  });
+  let mailOptions = utils.mail.newRide(req.user.email);
+  utils.mail.send(transporter, mailOptions);
+  res.redirect('/rides');
+})
+app.post('/join/ride', ensure.ensureLoggedIn(), (req, res) => {
+  Ride.findOne({
+
+  });
 })
 app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)

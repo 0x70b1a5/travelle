@@ -13,14 +13,7 @@ class DetailView extends React.Component {
     this.state = {
       ride: props.ride,
       title: "Join Ride",
-      data: {
-        date: 'none',
-        from: 'none',
-        to: 'none',
-        departure: 'none',
-        passengers: 'none',
-        driver: 'none'
-      }
+      data: ""
     }
   }
 
@@ -34,19 +27,18 @@ class DetailView extends React.Component {
   queryAndShow() {
     axios.get('/data/'+this.state.ride).then(function(res){
       var data = res.data[0] || this.state.data;
+      console.log(res); console.log(data);
       var contents = <div style={{padding: "1em", wordWrap: "break-word"}}>
-        <p>date: data.date</p>
-        <p>from: data.from</p>
-        <p>to: data.to</p>
-        <p>to: data.departure</p>
-        <p>passengers: data.passengers</p>
-        <p>driver: data.driver</p>
-        <div>
-          Join this ride?
-          <button>Join</button>
-        </div>
+        <p>date: {data.departure}</p>
+        <p>from: {data.from}</p>
+        <p>to: {data.to}</p>
+        <p>passengers: {data.passengers}</p>
+        <p>driver: {data.driver}</p>
+        <p>address: {data.address}</p>
+        <p>
+          <button className="btn btn-sm btn-primary">Join this ride</button>
+        </p>
       </div>
-      console.log(contents);
       this.setState({
         data: contents
       })
@@ -61,9 +53,7 @@ class DetailView extends React.Component {
   render(){
     return (
       <div>
-        <section>
-          <button onClick={() => this.queryAndShow()}>view sidebar</button>
-        </section>
+        <button className="btn btn-sm btn-default" onClick={() => this.queryAndShow()}>Join ride</button>
         <SkyLight
           closeButtonStyle={styles.close}
           ref="simpleDialog"

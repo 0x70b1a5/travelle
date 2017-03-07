@@ -429,3 +429,6 @@ body {
 .footer * {
   color: #fff !important;
 }
+.skylight-wrapper {
+  display: inline;
+}

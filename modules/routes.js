@@ -10,12 +10,14 @@ import Support from './Support'
 import SignIn from './SignIn'
 import Profile from './Profile'
 import Register from './Register'
+import Post from './Post'
 
 module.exports = (
   <Route path="/" component={App}>
     <IndexRoute component={Home}/>
     <Route path="/rides" component={Rides}/>
     <Route path="/drive" component={Drive}/>
+    <Route path="/post" component={Post}/>
     <Route path="/login" component={SignIn}/>
     <Route path="/about" component={About}/>
     <Route path="/code" component={Code}/>

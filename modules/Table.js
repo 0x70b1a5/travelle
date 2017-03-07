@@ -33,9 +33,9 @@ export default React.createClass({
   render() {
     var backButton = null;
     if (this.state.start >= 50) {
-      backButton = <a href="#hed"><button onClick={() => this.updateRides(-50)}>previous 50 rides</button></a>
+      backButton = <a href="#hed"><button className="btn btn-md btn-primary" onClick={() => this.updateRides(-50)}>previous 50 rides</button></a>
     }
-    var frwdButton = <a href="#hed"><button onClick={() => this.updateRides(50)}>next 50 rides</button></a>
+    var frwdButton = <a href="#hed"><button className="btn btn-md btn-primary" onClick={() => this.updateRides(50)}>next 50 rides</button></a>
     var paginators = <div className={"paginators"}>
       {frwdButton}
       {backButton}
@@ -46,7 +46,7 @@ export default React.createClass({
         {paginators}
         <table className="table">
           <thead>
-            <HeaderRow cells={this.props.headers} theme={this.props.theme+" header"} />
+            <HeaderRow cells={this.props.headers} theme={this.props.theme} />
           </thead>
           <tbody>
             {

@@ -6,7 +6,8 @@ export default React.createClass({
   getInitialState() {
     return {
       loggedIn: false,
-      email: "Nobody"
+      email: "Nobody",
+      status: "0",
     }
   },
   componentDidMount() {
@@ -14,15 +15,33 @@ export default React.createClass({
       if (res.data !== "") {
         this.setState({
           loggedIn: true,
-          email: res.data.email
+          email: res.data.email,
+          status: res.data.status
         })
       }
     })
   },
   render(){
-    var sessionLinks = this.state.loggedIn ?
-      [{ route: "/profile", text: this.state.email }, { route: "/logout", text: "Log out" }]
-      : [{ route: "/login", text: "Sign in" }, { route: "/register", text: "Sign up" }]
+    var sessionLinks = [
+      { route: "/drive", text: "Drive" },
+      { route: "/login", text: "Sign in" },
+      { route: "/register", text: "Register" }
+    ]
+    if (this.state.loggedIn) {
+      if (this.state.status == "1") {
+        sessionLinks = [
+          { route: "/post", text: "Post a Ride" },
+          { route: "/profile", text: this.state.email },
+          { route: "/logout", text: "Log out" }
+        ]
+      } else {
+        sessionLinks = [
+          { route: "/ride", text: "Browse Rides" },
+          { route: "/profile", text: this.state.email },
+          { route: "/logout", text: "Log out" }
+        ]
+      }
+    }
     return (
       <div>
       <nav id="mainNav" className="navbar navbar-default navbar-fixed-top">
@@ -40,16 +59,13 @@ export default React.createClass({
                   <NavLink to="/about">About</NavLink>
                 </li>
                 <li>
-                  <NavLink to="/rides">Ride</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/drive">Drive</NavLink>
-                </li>
-                <li>
                   <NavLink to={sessionLinks[0].route}>{sessionLinks[0].text}</NavLink>
                 </li>
                 <li>
-                  <a href={sessionLinks[1].route}>{sessionLinks[1].text}</a>
+                  <NavLink to={sessionLinks[1].route}>{sessionLinks[1].text}</NavLink>
+                </li>
+                <li>
+                  <a href={sessionLinks[2].route}>{sessionLinks[2].text}</a>
                 </li>
               </ul>
           </div>

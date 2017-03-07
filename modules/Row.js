@@ -13,7 +13,7 @@ export default React.createClass({
         <Cell theme={theme+" break-word"} data={cols.departure} />
         <Cell theme={theme+" break-word"} data={cols.passengers} />
         <Cell theme={theme+" break-word"} data={cols.driver} />
-        <PopupCell ride={cols.ride} />
+        <PopupCell ride={cols.id} />
       </tr>
     )
   }

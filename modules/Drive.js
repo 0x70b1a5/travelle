@@ -6,48 +6,41 @@ export default React.createClass({
       <div>
         <br/>
         <div className="col-md-9">
-          <h1> Post a Ride </h1>
+          <h1> Register to Drive </h1>
         </div>
         <section>
           <div className="container">
             <div className="row">
-              <div className="col-md-2">
-
-              </div>
-              <div className="col-md-4">
-                <p className="text-center"><i className="fa fa-5x text-primary sr-icons">🚗</i></p>
+              <div className="col-md-4 col-md-offset-2">
+                <p className="text-center"><i className="fa fa-5x sr-icons">🚗</i></p>
 
                 Thanks for choosing to drive with Travelle.
 
-                Please note all drivers are expected to abide by our <a href="/code">Code of Conduct</a> while traveling with riders.
+                Please note all drivers are expected to abide by our <a href="/code">Code of Conduct</a>.
               </div>
               <div className="col-md-4">
-                <form>
+                <form className="driver-register" action="/register" method="post">
                   <div className="form-group">
-                    <label htmlFor="driver-email">Email address</label>
-                    <input type="email" className="form-control" id="driver-email" placeholder="Email"/>
+                    <input name="name" type="text" className="form-control" placeholder="Your Name" />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="">Password</label>
-                    <input type="password" className="form-control" id="" placeholder="Password"/>
+                    <input name="email" type="email" className="form-control" id="driver-email" placeholder="Email"/>
                   </div>
-                  City:
-                  <select className="form-control">
-                    <option>Montreal</option>
-                    <option>Toronto</option>
-                    <option>Quebec City</option>
-                    <option>New York City</option>
-                    <option>Calgary</option>
-                  </select>
-                  <div className="checkbox">
-                    <label>
-                      <input type="checkbox"/> Check me out
-                    </label>
+                  <div className="form-group">
+                    <input name="password" type="password" className="form-control" placeholder="Password"/>
                   </div>
-                  <button type="submit" className="btn btn-default">Submit</button>
+                  <div className="form-group">
+                    <input name="confirmPassword" type="password" className="form-control" placeholder="Confirm Password"/>
+                  </div>
+                  <div className="form-group">
+                    <input name="car" type="text" className="form-control" placeholder="Make, model, color and year of your vehicle"/>
+                  </div>
+                  <div className="form-group">
+                    <input name="plate" type="text" className="form-control" placeholder="Vehicle license plate number"/>
+                  </div>
+                  <input type="hidden" name="status" value="1" />
+                  <button type="submit" className="btn btn-primary">Submit</button>
                 </form>
-              </div>
-              <div className="col-md-2">
               </div>
             </div>
           </div>
