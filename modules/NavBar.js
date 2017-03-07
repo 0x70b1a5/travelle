@@ -6,23 +6,22 @@ export default React.createClass({
   getInitialState() {
     return {
       loggedIn: false,
-      username: "Nobody"
+      email: "Nobody"
     }
   },
   componentDidMount() {
     axios.get('/auth/user').then((res) => {
-      console.log(res);
       if (res.data !== "") {
         this.setState({
           loggedIn: true,
-          username: res.data.username
+          email: res.data.email
         })
       }
     })
   },
   render(){
     var sessionLinks = this.state.loggedIn ?
-      [{ route: "/profile", text: this.state.username }, { route: "/logout", text: "Log out" }]
+      [{ route: "/profile", text: this.state.email }, { route: "/logout", text: "Log out" }]
       : [{ route: "/login", text: "Sign in" }, { route: "/register", text: "Sign up" }]
     return (
       <div>

@@ -18,6 +18,17 @@ const utils = {
         username: userJSON.username,
         email: userJSON.email
       }
+    },
+    valid: function(userJSON) {
+      if (userJSON === null ||
+        userJSON === undefined ||
+        userJSON === "" ||
+        !userJSON.password ||
+        !userJSON.confirmPassword ||
+        !userJSON.email ||
+        userJSON.password !== userJSON.confirmPassword
+      ) return false;
+      return true;
     }
   }
 }

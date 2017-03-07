@@ -6,6 +6,7 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import { match, RouterContext } from 'react-router'
 import routes from './modules/routes'
+import utils from './modules/utils'
 // import favicon from 'serve-favicon'
 const MongoClient = require('mongodb').MongoClient
 var passport = require('passport')
@@ -13,15 +14,19 @@ var Strategy = require('passport-local').Strategy;
 const session = require('express-session');
 import ensure from 'connect-ensure-login'
 const MongoStore = require('connect-mongo')(session);
+import bcrypt from 'bcrypt'
 
 
-
-passport.use(new Strategy(
-  function(username, password, cb) {
-    User.findOne({email: username}, function(err, user) {
+passport.use(new Strategy({
+    usernameField: 'email'
+  },
+  function(email, password, cb) {
+    User.findOne({email: email}, function(err, user) {
       if (err) { return cb(err); }
       if (!user) { return cb(null, false); }
-      if (user.password != password) { return cb(null, false); }
+      if (!bcrypt.compareSync(password, user.password)) {
+        return cb(null, false);
+      }
       return cb(null, user);
     });
   }));
@@ -69,6 +74,19 @@ app.post('/login',
   function(req, res) {
     res.redirect('/profile');
   });
+app.post('/register', (req, res) => {
+  if (utils.user.valid(req.body)) {
+    var hash = bcrypt.hashSync(req.body.password, 10);
+    User.insertOne({
+      email: req.body.email,
+      password: hash,
+      status: req.body.status
+    });
+    res.redirect('/login')
+  } else {
+    res.redirect('/register')
+  }
+})
 app.get('/logout',
   function(req, res){
     req.logout();

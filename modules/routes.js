@@ -9,6 +9,7 @@ import Code from './Code'
 import Support from './Support'
 import SignIn from './SignIn'
 import Profile from './Profile'
+import Register from './Register'
 
 module.exports = (
   <Route path="/" component={App}>
@@ -20,5 +21,6 @@ module.exports = (
     <Route path="/code" component={Code}/>
     <Route path="/support" component={Support}/>
     <Route path="/profile" component={Profile}/>
+    <Route path="/register" component={Register}/>
   </Route>
 )

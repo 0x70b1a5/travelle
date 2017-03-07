@@ -16,10 +16,11 @@ export default React.createClass({
     })
   },
   render(){
+    var status = this.state.user.status ? "Driver" : "Rider";
     return (
         <div className="container">
-          <h1> {this.state.user.username+"'s"} Profile </h1>
-          <p>Email: {this.state.user.email}</p>
+          <h1> Your Profile </h1>
+          <p>Email: {this.state.user.email} <span className="label label-default">{status}</span></p>
         </div>
     )
   }
