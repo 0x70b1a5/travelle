@@ -30,6 +30,7 @@
     "react-onclickoutside": "^5.9.0",
     "react-router": "^2.0.0",
     "react-skylight": "^0.4.1",
+    "react-stripe-checkout": "^2.2.5",
     "serve-favicon": "^2.3.2"
   },
   "devDependencies": {

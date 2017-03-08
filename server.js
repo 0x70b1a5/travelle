@@ -31,11 +31,9 @@ passport.use(new Strategy({
       return cb(null, user);
     });
   }));
-
 passport.serializeUser(function(user, cb) {
   cb(null, user.email);
 });
-
 passport.deserializeUser(function(email, cb) {
   User.findOne({email: email}, function (err, user) {
     if (err) { return cb(err); }
@@ -69,9 +67,10 @@ passport.deserializeUser(function(email, done) {
   });
 });
 
+
 var transporter = nodemailer.createTransport({
   service: 'gmail',
-  auth: {
+  auth: { //TODO dedicated email addr
     user: process.env.NODEMAILER_EMAIL,
     pass: process.env.NODEMAILER_PASS
   }
@@ -99,7 +98,7 @@ app.post('/register', (req, res) => {
       newUser.car = req.body.car;
       newUser.plate = req.body.plate;
     } else {
-      console.log(`BadUserInfoException: User status is invalid: ${newUser}`);
+      console.error(`BadUserInfoException: User status is invalid: ${newUser}`);
       res.redirect('/register');
       return;
     }
@@ -110,11 +109,17 @@ app.post('/register', (req, res) => {
     // send registration email
     let mailOptions = utils.mail.newUser(req.body.email);
     utils.mail.send(transporter, mailOptions);
+
     res.redirect('/login')
   } else {
     res.redirect('/register')
   }
 })
+app.post('/save-stripe-token', ensure.ensureLoggedIn(), (req, res) => {
+  User.where({email:req.user.email}, (err, rows) => {
+    // give token to user
+  })
+});
 app.get('/logout',
   function(req, res){
     req.logout();

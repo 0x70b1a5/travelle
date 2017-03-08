@@ -29,6 +29,9 @@ const utils = {
         !userJSON.email ||
         userJSON.password !== userJSON.confirmPassword
       ) return false;
+      User.findOne({email:userJSON.email}).toArray((err,rows) => {
+        if (err || rows.length > 0) return false;
+      });
       return true;
     },
     isDriver: function(user) {

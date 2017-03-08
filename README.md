@@ -1,14 +1,21 @@
 # Travelle
 Better carpooling for travellers.
 
-# TODO
-## Priority (Needed for MVP):
+# Features
+## Functional
 - Email notifications
 - New user registration
 - Ride posting page
 - Driver registration
+## Needs improvement
+- Visual design
+- Text input/display
+
+# TODO
+## Priority (Needed for MVP):
 - Driver fees portal
 - Final visual cleanup and bug checking
+- testing suite
 
 ## Reach goals:
 - Driver calendar/schedule view
@@ -17,7 +24,6 @@ Better carpooling for travellers.
 - View for tracking stats (income, rides, departures per city)
 - Affiliates booking dsahboard
 - Admin dashboard
-- Automated testing suite
 - Code documentation for future developers
 
 ### On Signup:
