@@ -7,6 +7,7 @@ import { renderToString } from 'react-dom/server'
 import { match, RouterContext } from 'react-router'
 import routes from './modules/routes'
 import utils from './modules/utils'
+import axios from 'axios'
 // import favicon from 'serve-favicon'
 const MongoClient = require('mongodb').MongoClient
 var passport = require('passport')
@@ -16,6 +17,7 @@ import ensure from 'connect-ensure-login'
 const MongoStore = require('connect-mongo')(session);
 import bcrypt from 'bcrypt'
 import nodemailer from 'nodemailer'
+var stripe = require("stripe")("sk_test_8PMWCmZQOMFXaPcXWwuA1Upu");
 
 
 passport.use(new Strategy({
@@ -80,7 +82,7 @@ var transporter = nodemailer.createTransport({
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),
   function(req, res) {
-    res.redirect('/profile');
+    res.redirect('/profile'); // welcome screen?
   });
 app.post('/register', (req, res) => {
   if (utils.user.valid(req.body)) {
@@ -97,6 +99,7 @@ app.post('/register', (req, res) => {
     } else if (newUser.status == '1') {
       newUser.car = req.body.car;
       newUser.plate = req.body.plate;
+      newUser.lastCharge = new Date(0); // i.e. never
     } else {
       console.error(`BadUserInfoException: User status is invalid: ${newUser}`);
       res.redirect('/register');
@@ -115,10 +118,34 @@ app.post('/register', (req, res) => {
     res.redirect('/register')
   }
 })
-app.post('/save-stripe-token', ensure.ensureLoggedIn(), (req, res) => {
-  User.where({email:req.user.email}, (err, rows) => {
-    // give token to user
-  })
+app.get('/driver-subscribe', ensure.ensureLoggedIn()); // TODO ensure users who access this page are drivers!
+app.post('/save-stripe-token', (req, res) => {
+  axios.get('/auth/user').then((res) => {
+    console.log(res.data);
+    // Create a Customer:
+    stripe.customers.create({
+      email: res.data.email,
+      source: req.body.stripeToken,
+    }).then(function(customer) {
+      // Charge customer
+      console.log('customer:', customer);
+      return stripe.charges.create({
+        amount: 500,
+        currency: "cad",
+        customer: customer.id,
+      });
+    }).then(function(charge) {
+      console.log("charge:", charge);
+      // Use and save the charge info and save customer ID
+      User.updateOne({email:req.user.email}, {$set: {
+        customerId: charge.customer,
+        lastCharge: Date.now()
+      }}, (err, res) => {
+        assert.equal(err, null);
+        assert.equal(res.customerId, charge.customer);
+      });
+    });
+  });
 });
 app.get('/logout',
   function(req, res){
@@ -127,14 +154,15 @@ app.get('/logout',
   });
 app.get('/profile', ensure.ensureLoggedIn());
 app.get('/data/:id', (req,res) => {
-  Ride.find({"id":req.params.id}).toArray((err, rows) =>{
+  Ride.find({id:req.params.id}).toArray((err, rows) =>{
     assert.equal(err,null);
     res.json(rows);
   })
 })
 app.get('/auth/user', (req, res) => { // returns current user or null
   res.json(req.user);
-})
+});
+app.get('/post', ensure.ensureLoggedIn());
 app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
   var ride = req.body;
   if (!utils.user.isDriver(req.user) ||
@@ -159,7 +187,7 @@ app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
 })
 app.post('/join/ride', ensure.ensureLoggedIn(), (req, res) => {
   Ride.findOne({
-
+    // TODO
   });
 })
 app.get('/data/limit/:limit/start/:start', (req,res) => {

@@ -1,7 +1,26 @@
 import React from 'react'
+import axios from 'axios'
 
 export default React.createClass({
+  getInitialState() {
+    return {
+      lastCharge: new Date(0)
+    }
+  },
+  componentDidMount() {
+    axios.get('/auth/user').then((res) => {
+      if (res.data !== "") {
+        this.setState({
+          lastCharge: res.data.lastCharge
+        })
+      }
+    })
+  },
   render() {
+    var submit = this.lastCharge > Date.now()-2592000000 ? // 1 month
+      <p><input type="submit" className="btn btn-primary" value="Post Ride"/></p>
+      : <p>Before you post a ride, please <a href="/driver-subscribe">verify your profile</a> with Travelle.</p>
+
     return (
       <div className="container">
         <h1> Post a Ride </h1>
@@ -17,7 +36,7 @@ export default React.createClass({
             <h3>Ride details</h3>
             <form className="ride-post" action="/post/ride" method="post">
               <p><select name="from">
-                <option value="" disabled selected>From city:</option>
+                <option value="" disabled value>From city:</option>
                 <option>Montreal</option>
                 <option>New York City</option>
                 <option>Quebec City</option>
@@ -27,7 +46,7 @@ export default React.createClass({
                 <option>Vancouver</option>
               </select></p>
               <p><select name="to">
-                <option value="" disabled selected>To city:</option>
+                <option value="" disabled value>To city:</option>
                 <option>Montreal</option>
                 <option>New York City</option>
                 <option>Quebec City</option>
@@ -39,7 +58,9 @@ export default React.createClass({
               <p><input type="datetime-local" name="departure"/> Departure date and time</p>
               <p><input name="seats" type="number" min="1" max="12"/> seats available</p>
               <p><textarea name="address" placeholder="Address and directions to pickup location"/></p>
-              <p><input type="submit" className="btn btn-primary" value="Post Ride"/></p>
+
+              {submit}
+
             </form>
           </div>
         </div>

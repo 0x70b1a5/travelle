@@ -31,7 +31,8 @@
     "react-router": "^2.0.0",
     "react-skylight": "^0.4.1",
     "react-stripe-checkout": "^2.2.5",
-    "serve-favicon": "^2.3.2"
+    "serve-favicon": "^2.3.2",
+    "stripe": "^4.15.1"
   },
   "devDependencies": {
     "babel-core": "^6.5.1",
