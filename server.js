@@ -7,7 +7,7 @@ import { renderToString } from 'react-dom/server'
 import { match, RouterContext } from 'react-router'
 import routes from './modules/routes'
 import utils from './modules/utils'
-import axios from 'axios'
+import bodyParser from 'body-parser'
 // import favicon from 'serve-favicon'
 const MongoClient = require('mongodb').MongoClient
 var passport = require('passport')
@@ -47,6 +47,7 @@ passport.deserializeUser(function(email, cb) {
 var DB, User, Ride;
 const app = express()
 app.use(compression())
+app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public'), {index: false}))
 app.use(session({
   secret: 's e c u r i t y',
@@ -56,7 +57,7 @@ app.use(session({
     url: 'mongodb://localhost:27017/rides'
   })
 }));
-app.use(require('body-parser').urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 // app.use(favicon(__dirname + 'public/favicon.ico'))
@@ -120,32 +121,26 @@ app.post('/register', (req, res) => {
 })
 app.get('/driver-subscribe', ensure.ensureLoggedIn()); // TODO ensure users who access this page are drivers!
 app.post('/save-stripe-token', (req, res) => {
-  axios.get('/auth/user').then((res) => {
-    console.log(res.data);
-    // Create a Customer:
-    stripe.customers.create({
-      email: res.data.email,
-      source: req.body.stripeToken,
-    }).then(function(customer) {
-      // Charge customer
-      console.log('customer:', customer);
-      return stripe.charges.create({
-        amount: 500,
-        currency: "cad",
-        customer: customer.id,
-      });
-    }).then(function(charge) {
-      console.log("charge:", charge);
-      // Use and save the charge info and save customer ID
-      User.updateOne({email:req.user.email}, {$set: {
-        customerId: charge.customer,
-        lastCharge: Date.now()
-      }}, (err, res) => {
-        assert.equal(err, null);
-        assert.equal(res.customerId, charge.customer);
-      });
+  console.log("req:", req.body);
+  // Create a Customer:
+  stripe.charges.create({
+    amount: 500,
+    currency: "cad",
+    description: "Driver verification",
+    source: req.body.id
+  }).then(charge => {
+    console.log("charge:", charge);
+    // Use and save the charge info and save customer ID
+    User.updateOne({email:req.user.email}, {$set: {
+      customerId: charge.customer,
+      lastCharge: Date.now()
+    }}, (err, res) => {
+      assert.equal(err, null);
+      assert.equal(res.customerId, charge.customer);
     });
   });
+
+  // TODO send email
 });
 app.get('/logout',
   function(req, res){

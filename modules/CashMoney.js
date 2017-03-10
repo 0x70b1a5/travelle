@@ -1,26 +1,29 @@
-import React from 'react'
-import StripeCheckout from 'react-stripe-checkout';
+import React, {Component} from 'react'
+import StripeCheckout from 'react-stripe-checkout'
 
-export default React.createClass({
-  onToken(token) {
+class CashMoney extends Component {
+  onToken (token) {
     fetch('/save-stripe-token', {
       method: 'POST',
       body: JSON.stringify(token),
-    }).then(token => {
-      console.log(token);
-      alert(`We are in business, ${token.email}`);
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      response.json().then(data => {
+        return (data);
+      });
     });
-  },
-
-  // ... ?
-
+  }
   render() {
     return (
-      // ... ??
       <StripeCheckout
-        token={this.onToken}
         stripeKey="pk_test_kjqeoiElQx07966IAuL4FfzQ"
+        token={this.onToken}
+        amount={500}
       />
     )
   }
-})
+}
+export default CashMoney;
