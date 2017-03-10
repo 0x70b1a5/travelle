@@ -15,7 +15,9 @@ var Strategy = require('passport-local').Strategy;
 const session = require('express-session');
 import ensure from 'connect-ensure-login'
 const MongoStore = require('connect-mongo')(session);
+import axios from 'axios'
 import bcrypt from 'bcrypt'
+import md5 from 'md5'
 import nodemailer from 'nodemailer'
 var stripe = require("stripe")("sk_test_8PMWCmZQOMFXaPcXWwuA1Upu");
 
@@ -86,7 +88,7 @@ app.post('/login',
     res.redirect('/profile'); // welcome screen?
   });
 app.post('/register', (req, res) => {
-  if (utils.user.valid(req.body)) {
+  if (utils.user.valid(req.body) && utils.file.valid(req.files.picture)) {
     var hash = bcrypt.hashSync(req.body.password, 10),
     newUser = {
       name: req.body.name,
@@ -101,6 +103,7 @@ app.post('/register', (req, res) => {
       newUser.car = req.body.car;
       newUser.plate = req.body.plate;
       newUser.lastCharge = new Date(0); // i.e. never
+      newUser.picture = req.files.picture;
     } else {
       console.error(`BadUserInfoException: User status is invalid: ${newUser}`);
       res.redirect('/register');
@@ -111,8 +114,7 @@ app.post('/register', (req, res) => {
       assert.equal(err, null)
     });
     // send registration email
-    let mailOptions = utils.mail.newUser(req.body.email);
-    utils.mail.send(transporter, mailOptions);
+    utils.mail.send(transporter, utils.mail.newUser(req.body.email));
 
     res.redirect('/login')
   } else {
@@ -121,26 +123,39 @@ app.post('/register', (req, res) => {
 })
 app.get('/driver-subscribe', ensure.ensureLoggedIn()); // TODO ensure users who access this page are drivers!
 app.post('/save-stripe-token', (req, res) => {
-  console.log("req:", req.body);
-  // Create a Customer:
-  stripe.charges.create({
-    amount: 500,
-    currency: "cad",
-    description: "Driver verification",
-    source: req.body.id
+  console.log("token: ", req.body);
+  var email = req.body.email,
+  userEmail = req.body.userEmail;
+  // Create a Customer
+  stripe.customers.create({
+    email: email,
+    source: req.body.id,
+  }).then(customer => {
+    console.log("customer: ", customer);
+    // Charge them
+    return stripe.charges.create({
+      amount: 500,
+      currency: "cad",
+      description: "Driver verification",
+      customer: customer.id
+    });
   }).then(charge => {
     console.log("charge:", charge);
-    // Use and save the charge info and save customer ID
-    User.updateOne({email:req.user.email}, {$set: {
+    // Use and save the charge info and save customer ID to
+    //   user's Travelle account.
+    // we can't use the charge email in case they paid
+    //   with a different email.
+    User.findOneAndUpdate({email:userEmail}, {$set: {
       customerId: charge.customer,
-      lastCharge: Date.now()
-    }}, (err, res) => {
-      assert.equal(err, null);
-      assert.equal(res.customerId, charge.customer);
+      lastCharge: Number(new Date())
+    }}, // {returnNewDocument: true},
+    (err_, res_) => {
+      assert.equal(err_, null);
+      // finally, send email:
+      utils.mail.send(transporter, utils.mail.subscription(userEmail));
     });
   });
-
-  // TODO send email
+  res.sendStatus(200);
 });
 app.get('/logout',
   function(req, res){
@@ -161,23 +176,22 @@ app.get('/post', ensure.ensureLoggedIn());
 app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
   var ride = req.body;
   if (!utils.user.isDriver(req.user) ||
+    !utils.user.subscribed(req.user) ||
     !utils.ride.valid(ride)
   ) {
-    console.log(req);
     res.redirect('/post');
-    return;
+    return; // is this necessary?
   }
   ride.driver = req.user.name;
   ride.passengers = 0;
   Ride.find().toArray((err, all) => {
     assert.equal(err, null);
-    ride.id = String(all.length);
+    ride.id = md5(all.length).slice(0,6);
     Ride.insertOne(ride, (err, rows) => {
       assert.equal(err, null);
     });
   });
-  let mailOptions = utils.mail.newRide(req.user.email);
-  utils.mail.send(transporter, mailOptions);
+  utils.mail.send(transporter, utils.mail.newRide(req.user.email));
   res.redirect('/rides');
 })
 app.post('/join/ride', ensure.ensureLoggedIn(), (req, res) => {

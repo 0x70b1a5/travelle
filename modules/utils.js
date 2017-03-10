@@ -1,3 +1,5 @@
+const MAX_FILESIZE = 2*Math.pow(1024,2);
+
 const utils = {
   getShortDate: function(date) {
     if (date == null) {
@@ -40,11 +42,23 @@ const utils = {
         !user.plate
       ) return false;
       return true;
+    },
+    subscribed: user => {
+      if (user.status != '1' ||
+        user.lastCharge <= Date.now()-2592000000 // 1 month
+      ) return false;
+      return true;
+    },
+    exists: email => {
+      User.findOne({email: email}, (err, res) => {
+        if (res) return true;
+      })
+      return false;
     }
   },
 
   mail: {
-    newUser: function(email){
+    newUser: email => {
       return {
         from: '"Travelle" <go@travelle.com>',
         to: email,
@@ -53,16 +67,25 @@ const utils = {
         html: 'Thanks for signing up to ride with Travelle. We look forward to having you with us. If you have any questions, please reach out: contact@travelle.com'
       }
     },
-    newRide: function(email){//TODO ride link, detail info
+    newRide: email => {//TODO ride link, detail info
       return {
         from: '"Travelle" <go@travelle.com>',
         to: email,
         subject: 'Travelle: New ride listing posted',
-        text: "You just posted a ride on Travelle. Awesome! If you have any questions, please reach out: contact@travelle.com",
-        html: "You just posted a ride on Travelle. Awesome! If you have any questions, please reach out: contact@travelle.com"
+        text: "You just posted a ride. Awesome! If you have any questions, please reach out: contact@travelle.com",
+        html: "You just posted a ride. Awesome! If you have any questions, please reach out: contact@travelle.com"
       }
     },
-    send: function(transporter, mailOptions) {
+    subscription: email => {
+      return {
+        from: '"Travelle" <go@travelle.com>',
+        to: email,
+        subject: 'Travelle: Verification Complete',
+        text: "Congratulations! You have been verified to drive. If you have any questions, please reach out: contact@travelle.com",
+        html: "Congratulations! You have been verified to drive. If you have any questions, please reach out: contact@travelle.com"
+      }
+    },
+    send: (transporter, mailOptions) => {
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
           return console.log(err);
@@ -73,17 +96,27 @@ const utils = {
   },
 
   ride: {
-    valid: function(rideJSON) {
+    valid: rideJSON => {
       if (!rideJSON ||
         !rideJSON.from ||
         !rideJSON.to ||
-        !rideJSON.departure || //TODO validate datetime > now
+        !rideJSON.departure || //TODO validate time > now
         !rideJSON.address ||
         !rideJSON.seats
       ) return false;
       return true;
     }
   },
+
+  file: {
+    valid: file => {
+      console.log(file);
+      if (file.size > MAX_FILESIZE ||
+        (file.type != 'image/png' || file.type != 'image/jpg')
+      ) return false;
+      return true;
+    }
+  }
 }
 
 export default utils;

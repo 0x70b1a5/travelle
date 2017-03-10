@@ -17,9 +17,9 @@ export default React.createClass({
     })
   },
   render() {
-    var submit = this.lastCharge > Date.now()-2592000000 ? // 1 month
-      <p><input type="submit" className="btn btn-primary" value="Post Ride"/></p>
-      : <p>Before you post a ride, please <a href="/driver-subscribe">verify your profile</a> with Travelle.</p>
+    var submit = this.lastCharge <= Date.now()-2592000000 ? // 1 month
+      <p>Before you post a ride, please <a href="/driver-subscribe">verify your profile</a> with Travelle.</p>
+      : <p><input type="submit" className="btn btn-primary" value="Post Ride"/></p>
 
     return (
       <div className="container">
@@ -35,8 +35,17 @@ export default React.createClass({
           <div className="col-md-6">
             <h3>Ride details</h3>
             <form className="ride-post" action="/post/ride" method="post">
-              <p><select name="from">
-                <option value="" disabled value>From city:</option>
+              <p><select name="from" className="form-control" value="From city:">
+                <option value="" disabled>From city:</option>
+                <option>Montreal</option>
+                <option>New York City</option>
+                <option>Quebec City</option>
+                <option>Toronto</option>
+                <option>Boston</option>
+                <option>Calgary</option>
+                <option>Vancouver</option>
+              </select><select name="to" className="form-control" value="To city:">
+                <option value="" disabled>To city:</option>
                 <option>Montreal</option>
                 <option>New York City</option>
                 <option>Quebec City</option>
@@ -45,19 +54,9 @@ export default React.createClass({
                 <option>Calgary</option>
                 <option>Vancouver</option>
               </select></p>
-              <p><select name="to">
-                <option value="" disabled value>To city:</option>
-                <option>Montreal</option>
-                <option>New York City</option>
-                <option>Quebec City</option>
-                <option>Toronto</option>
-                <option>Boston</option>
-                <option>Calgary</option>
-                <option>Vancouver</option>
-              </select></p>
-              <p><input type="datetime-local" name="departure"/> Departure date and time</p>
-              <p><input name="seats" type="number" min="1" max="12"/> seats available</p>
-              <p><textarea name="address" placeholder="Address and directions to pickup location"/></p>
+              <p><input className="form-control" type="datetime-local" name="departure"/></p>
+              <p><input className="form-control" name="seats" type="number" min="1" max="12" placeholder="Seats available"/></p>
+              <p><textarea className="form-control" name="address" placeholder="Address and directions to pickup location"/></p>
 
               {submit}
 

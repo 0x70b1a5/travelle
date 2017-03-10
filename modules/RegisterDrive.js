@@ -12,32 +12,20 @@ export default React.createClass({
           <div className="container">
             <div className="row">
               <div className="col-md-4 col-md-offset-2">
+                <h3>Thanks for driving with Travelle.</h3>
                 <p className="text-center"><i className="fa fa-5x sr-icons">🚗</i></p>
-
-                Thanks for choosing to drive with Travelle.
-
-                Please note all drivers are expected to abide by our <a href="/code">Code of Conduct</a>.
+                <p>Please note all drivers are expected to follow our <a href="/code">Code of Conduct</a>.</p>
               </div>
               <div className="col-md-4">
+                <h3> Your info: </h3>
                 <form className="driver-register" action="/register" method="post">
-                  <div className="form-group">
-                    <input name="name" type="text" className="form-control" placeholder="Your Name" />
-                  </div>
-                  <div className="form-group">
-                    <input name="email" type="email" className="form-control" id="driver-email" placeholder="Email"/>
-                  </div>
-                  <div className="form-group">
-                    <input name="password" type="password" className="form-control" placeholder="Password"/>
-                  </div>
-                  <div className="form-group">
-                    <input name="confirmPassword" type="password" className="form-control" placeholder="Confirm Password"/>
-                  </div>
-                  <div className="form-group">
-                    <input name="car" type="text" className="form-control" placeholder="Make, model, color and year of your vehicle"/>
-                  </div>
-                  <div className="form-group">
-                    <input name="plate" type="text" className="form-control" placeholder="Vehicle license plate number"/>
-                  </div>
+                  <p><input name="name" type="text" required className="form-control" placeholder="Your Name" /></p>
+                  <p><input name="email" type="email" required className="form-control" id="driver-email" placeholder="Email"/></p>
+                  <p><input name="password" type="password" required className="form-control" placeholder="Password"/></p>
+                  <p><input name="confirmPassword" type="password" required className="form-control" placeholder="Confirm Password"/></p>
+                  <p><input name="car" type="text" className="form-control" required placeholder="Make, model, color and year of your vehicle"/></p>
+                  <p><input name="plate" type="text" className="form-control" required placeholder="Vehicle license plate number"/></p>
+                  <p>Your best picture (less than 2 MB): <input type="file" className="form-control" name="picture" required/></p>
                   <input type="hidden" name="status" value="1" />
                   <button type="submit" className="btn btn-primary">Submit</button>
                 </form>
