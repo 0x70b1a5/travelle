@@ -88,6 +88,7 @@ app.post('/login',
     res.redirect('/profile'); // welcome screen?
   });
 app.post('/register', (req, res) => {
+  console.log(req.files);
   if (utils.user.valid(req.body) && utils.file.valid(req.files.picture)) {
     var hash = bcrypt.hashSync(req.body.password, 10),
     newUser = {
@@ -118,6 +119,7 @@ app.post('/register', (req, res) => {
 
     res.redirect('/login')
   } else {
+    console.error(`BadUserInfoException: User is invalid: ${req}`);
     res.redirect('/register')
   }
 })
