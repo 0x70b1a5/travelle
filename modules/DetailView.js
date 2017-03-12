@@ -3,9 +3,7 @@ import SkyLight from 'react-skylight'
 import axios from 'axios'
 import styles from './styles.js'
 import onClickOutside from 'react-onclickoutside'
-import utils from './utils.js'
-
-var getShortDate = utils.getShortDate
+import UserInfo from './UserInfo'
 
 class DetailView extends React.Component {
   constructor(props) {
@@ -25,24 +23,28 @@ class DetailView extends React.Component {
   }
 
   queryAndShow() {
-    axios.get('/data/'+this.state.ride).then(function(res){
+    var that = this;
+    axios.get('/data/'+this.state.ride).then(function(res) {
       var data = res.data[0] || this.state.data;
-      console.log(res); console.log(data);
-      var contents = <div style={{padding: "1em", wordWrap: "break-word"}}>
-        <p>date: {data.departure}</p>
-        <p>from: {data.from}</p>
-        <p>to: {data.to}</p>
-        <p>passengers: {data.passengers}</p>
-        <p>driver: {data.driver}</p>
-        <p>address: {data.address}</p>
-        <p>
-          <button className="btn btn-sm btn-primary">Join this ride</button>
-        </p>
-      </div>
-      this.setState({
-        data: contents
+      axios.get('/data/user/'+data.driver).then(function(user) {
+        console.log(user);
+        var contents = (
+          <div style={{padding: "1em", wordWrap: "break-word"}}>
+            <h4> Ride details </h4>
+            <h5>{data.seats - data.passengers} seats remaining</h5>
+            <p>This ride leaves from {data.from} on {Date(data.departure)}, destination {data.to}. </p>
+            <UserInfo user={user.data}/>
+            <p>Pickup address details: {data.address}</p>
+            <form action={"/join/ride"+data.id} method="/post">
+              <button className="btn btn-sm btn-primary">Join this ride</button>
+            </form>
+          </div>
+        );
+        that.setState({
+          data: contents
+        })
       })
-    }.bind(this))
+    })
     this.refs.simpleDialog.show()
   }
 
@@ -55,6 +57,7 @@ class DetailView extends React.Component {
       <div>
         <button className="btn btn-sm btn-default" onClick={() => this.queryAndShow()}>Join ride</button>
         <SkyLight
+          dialogStyles={styles.details}
           closeButtonStyle={styles.close}
           ref="simpleDialog"
           showOverlay={false}

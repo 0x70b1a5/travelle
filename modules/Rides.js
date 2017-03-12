@@ -33,13 +33,20 @@ export default React.createClass({
   },
   render(){
     return (
-      <div className="container">
-        <h1>Ride</h1>
-        <div className="row">
-          <div className="rideTable col-md-10 col-md-offset-1">
-            <Table headers={this.state.headers} rows={this.state.rows} theme={""}/>
-          </div>
+      <div>
+        <br/>
+        <div className="col-md-9">
+          <h1>Join a Ride</h1>
         </div>
+        <section>
+          <div className="container">
+            <div className="row">
+              <div className="rideTable col-md-10 col-md-offset-1">
+                <Table headers={this.state.headers} rows={this.state.rows} theme={""}/>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     )
   }

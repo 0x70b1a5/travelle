@@ -114,7 +114,7 @@ app.post('/register', upload.single('picture'), (req, res, next) => {
     newUser.plate = req.body.plate;
     newUser.lastCharge = new Date(0); // i.e. never
   } else {
-    console.error(`BadUserInfoException: User status is invalid: ${newUser}`);
+    console.error(`BadUserInfoException: User status is invalid:`, newUser);
     res.redirect('/register');
     return;
   }
@@ -173,6 +173,12 @@ app.get('/data/:id', (req,res) => {
     assert.equal(err,null);
     res.json(rows);
   })
+});
+app.get('/data/user/:email', (req, res) => {
+  User.findOne({email: req.params.email}, (err, doc) => {
+    assert.equal(err, null);
+    res.json(utils.user.parse(doc));
+  })
 })
 app.get('/auth/user', (req, res) => { // returns current user or null
   res.json(req.user);
@@ -180,10 +186,16 @@ app.get('/auth/user', (req, res) => { // returns current user or null
 app.get('/post', ensure.ensureLoggedIn());
 app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
   var ride = req.body;
-  if (!utils.user.isDriver(req.user) ||
-    !utils.user.subscribed(req.user) ||
-    !utils.ride.valid(ride)
-  ) {
+  if (!utils.user.isDriver(req.user)) {
+    console.error(`BadUserInfoException: User is not a driver:`, req.user);
+    res.redirect('/post');
+    return;
+  } else if (!utils.user.subscribed(req.user)) {
+    console.error(`UserNotSubscribedException: User is not subscribed:`, req.user);
+    res.redirect('/post');
+    return;
+  } else if (!utils.ride.valid(ride)) {
+    console.error(`BadRideInfoException: Ride info is invalid:`, req.body);
     res.redirect('/post');
     return; // is this necessary? // Yes.
   }
@@ -201,8 +213,8 @@ app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
   utils.mail.send(transporter, utils.mail.newRide(req.user.email));
   res.redirect('/rides');
 })
-app.post('/join/ride', ensure.ensureLoggedIn(), (req, res) => {
-  Ride.findOne({id: req.body.id}, (err, ride) => {
+app.post('/join/ride:id', ensure.ensureLoggedIn(), (req, res) => {
+  Ride.findOne({id: req.params.id}, (err, ride) => {
     assert.equal(err,null);
     if (ride.list.indexOf(req.user.email) !== -1 ||
       req.user.email == ride.driver) {

@@ -12,15 +12,17 @@ const utils = {
 
   user: {
     default: {
-      username: "Nobody",
+      name: "Nobody",
       email: "no@email.com",
-      picture: "public/img/uploads/nobody.jpg"
+      picture: "public/img/uploads/nobody.jpg",
+      status: '0'
     },
-    parse: userJSON => {
+    parse: userJSON => { // ensures no unwanted info leakage
       return {
         name: userJSON.name,
         email: userJSON.email,
-        picture: userJSON.picture
+        picture: userJSON.picture,
+        status: userJSON.status
       }
     },
     valid: (db, userJSON) => {

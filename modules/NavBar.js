@@ -6,7 +6,7 @@ export default React.createClass({
   getInitialState() {
     return {
       loggedIn: false,
-      email: "Nobody",
+      name: "Nobody",
       status: "0",
     }
   },
@@ -15,7 +15,7 @@ export default React.createClass({
       if (res.data !== "") {
         this.setState({
           loggedIn: true,
-          email: res.data.email,
+          name: res.data.name,
           status: res.data.status
         })
       }
@@ -31,13 +31,13 @@ export default React.createClass({
       if (this.state.status == "1") {
         sessionLinks = [
           { route: "/post", text: "Post a Ride" },
-          { route: "/profile", text: this.state.email },
+          { route: "/profile", text: this.state.name },
           { route: "/logout", text: "Log out" }
         ]
       } else {
         sessionLinks = [
           { route: "/rides", text: "Browse Rides" },
-          { route: "/profile", text: this.state.email },
+          { route: "/profile", text: this.state.name },
           { route: "/logout", text: "Log out" }
         ]
       }

@@ -9,7 +9,7 @@ export default React.createClass({
   },
   componentDidMount() {
     axios.get('/auth/user').then((res) => {
-      if (res.data !== "") {
+      if (res.data !== "" && res.data.lastCharge != undefined) {
         this.setState({
           lastCharge: res.data.lastCharge
         })
@@ -17,7 +17,7 @@ export default React.createClass({
     })
   },
   render() {
-    var submit = this.lastCharge <= Date.now()-2592000000 ? // 1 month
+    var submit = this.state.lastCharge <= Date.now()-2592000000 ? // 1 month
       <p>Before you post a ride, please <a href="/driver-subscribe">verify your profile</a> with Travelle.</p>
       : <p><input type="submit" className="btn btn-primary" value="Post Ride"/></p>
 
@@ -35,7 +35,7 @@ export default React.createClass({
           <div className="col-md-6">
             <h3>Ride details</h3>
             <form className="ride-post" action="/post/ride" method="post">
-              <p><select name="from" className="form-control" value="From city:">
+              <p>From: <select name="from" className="form-control">
                 <option value="" disabled>From city:</option>
                 <option>Montreal</option>
                 <option>New York City</option>
@@ -44,7 +44,7 @@ export default React.createClass({
                 <option>Boston</option>
                 <option>Calgary</option>
                 <option>Vancouver</option>
-              </select><select name="to" className="form-control" value="To city:">
+              </select>To: <select name="to" className="form-control">
                 <option value="" disabled>To city:</option>
                 <option>Montreal</option>
                 <option>New York City</option>

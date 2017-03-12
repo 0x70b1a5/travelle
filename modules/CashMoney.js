@@ -6,15 +6,17 @@ export default React.createClass({
   getInitialState() {
     return {
       email: "user@example.com",
-      lastCharge: 0
+      lastCharge: new Date(0)
     }
   },
   updateUserInfo(){
     axios.get('/auth/user').then((res) => {
       if (res.data !== "") {
+        var lastCharge = res.data.lastCharge || new Date(0);
+        console.log(lastCharge);
         this.setState({
           email: res.data.email,
-          lastCharge: res.data.lastCharge
+          lastCharge: lastCharge
         })
       }
     })
@@ -34,7 +36,7 @@ export default React.createClass({
       }
     }).then(response => {
       // retrieve user's new lastCharge
-      that.updateUserInfo();
+      setTimeout(that.updateUserInfo, 3000);
     });
   },
   render() {

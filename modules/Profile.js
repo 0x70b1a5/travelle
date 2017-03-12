@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import utils from './utils.js'
+import UserInfo from './UserInfo'
 
 export default React.createClass({
   getInitialState() {
@@ -16,7 +17,6 @@ export default React.createClass({
     })
   },
   render(){
-    var status = this.state.user.status ? "Driver" : "Rider";
     return (
       <div>
         <br/>
@@ -25,9 +25,8 @@ export default React.createClass({
         </div>
         <section>
           <div className="container">
-            <p><img style={{maxHeight: "300px", maxWidth: "300px"}} src={this.state.user.picture.replace(/public\//,'')} /></p>
-            <h4>{this.state.user.name}</h4><span className="label label-default">{status}</span>
-            <p>{this.state.user.email}</p>
+            <UserInfo user={this.state.user} />
+            <p>Your account email: {this.state.user.email}</p>
           </div>
         </section>
       </div>
