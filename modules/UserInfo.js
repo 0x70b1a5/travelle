@@ -8,7 +8,7 @@ export default React.createClass({
     var status = Number(this.props.user.status) ? "Driver" : "Rider";
     return (
       <div className="user-info">
-        <Avatar img={this.props.user.picture} />
+        <Avatar img={this.props.user.picture} size={this.props.size}/>
         <h5>{this.props.user.name} <span className="label label-default">{status}</span></h5>
       </div>
     )

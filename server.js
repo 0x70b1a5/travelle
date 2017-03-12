@@ -213,12 +213,15 @@ app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
   utils.mail.send(transporter, utils.mail.newRide(req.user.email));
   res.redirect('/rides');
 })
-app.post('/join/ride:id', ensure.ensureLoggedIn(), (req, res) => {
+app.post('/join/ride/:id', ensure.ensureLoggedIn(), (req, res) => {
   Ride.findOne({id: req.params.id}, (err, ride) => {
     assert.equal(err,null);
-    if (ride.list.indexOf(req.user.email) !== -1 ||
-      req.user.email == ride.driver) {
-      // user is already on ride!
+    if (ride.list.indexOf(req.user.email) !== -1) {
+      console.error(`UserUnauthorizedException: User is already on ride:`, req.user, ride);
+      res.sendStatus(403);
+      return;
+    } else if (req.user.email == ride.driver) {
+      console.error(`UserUnauthorizedException: Driver cannot join ride:`, req.user, ride);
       res.sendStatus(403);
       return;
     }
@@ -227,9 +230,12 @@ app.post('/join/ride:id', ensure.ensureLoggedIn(), (req, res) => {
     Ride.updateOne({id: ride.id},
     {$set: {list: newList, passengers: ++ride.passengers}}, (err, doc) => {
       assert.equal(err,null);
-      res.sendStatus(200);
+      res.redirect('/rides/'+ride.id)
     })
   });
+});
+app.get('/ride/:id', (res, req) => {
+  // TOOD ride info api
 })
 app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)

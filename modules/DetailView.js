@@ -33,9 +33,9 @@ class DetailView extends React.Component {
             <h4> Ride details </h4>
             <h5>{data.seats - data.passengers} seats remaining</h5>
             <p>This ride leaves from {data.from} on {Date(data.departure)}, destination {data.to}. </p>
-            <UserInfo user={user.data}/>
+            <UserInfo size={"small"} user={user.data}/>
             <p>Pickup address details: {data.address}</p>
-            <form action={"/join/ride"+data.id} method="/post">
+            <form action={"/join/ride/"+data.id} method="post">
               <button className="btn btn-sm btn-primary">Join this ride</button>
             </form>
           </div>
