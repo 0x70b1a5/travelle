@@ -17,6 +17,7 @@ export default React.createClass({
     })
   },
   render(){
+    // TODO add list of current rides
     return (
       <div>
         <br/>

@@ -69,6 +69,7 @@ const utils = {
       return {
         from: '"Travelle" <go@travelle.com>',
         to: email,
+        bcc: "ops@getpaidtodrive.net",
         subject: 'Travelle: New ride listing posted',
         text: "You just posted a ride. Awesome! If you have any questions, please reach out: contact@travelle.com",
         html: "You just posted a ride. Awesome! If you have any questions, please reach out: contact@travelle.com"
@@ -78,9 +79,20 @@ const utils = {
       return {
         from: '"Travelle" <go@travelle.com>',
         to: email,
+        bcc: "ops@getpaidtodrive.net",
         subject: 'Travelle: Verification Complete',
         text: "Congratulations! You have been verified to drive. If you have any questions, please reach out: contact@travelle.com",
         html: "Congratulations! You have been verified to drive. If you have any questions, please reach out: contact@travelle.com"
+      }
+    },
+    joinRide: (email, ride) => {
+      return {
+        from: '"Travelle" <go@travelle.com>',
+        to: email,
+        bcc: "ops@getpaidtodrive.net",
+        subject: 'Travelle: You just joined a ride',
+        text: `You have joined a ride: ${ride} \n\n Make sure to be there on time! \n If you have any questions, please reach out: contact@travelle.com`,
+        html: `You have joined a ride: ${ride} \n\n Make sure to be there on time! \n If you have any questions, please reach out: contact@travelle.com`
       }
     },
     send: (transporter, mailOptions) => {
@@ -100,9 +112,21 @@ const utils = {
         !rideJSON.to ||
         !rideJSON.departure || //TODO validate time > now
         !rideJSON.address ||
+        !rideJSON.price ||
         !rideJSON.seats
       ) return false;
       return true;
+    },
+
+    text: rideJSON => {
+      return `
+        From: ${rideJSON.from}
+        To: ${rideJSON.to}
+        Date: ${Date(rideJSON.departure)}
+        Address: ${rideJSON.address}
+        Driver email: ${rideJSON.email}
+        Ticket price: ${rideJSON.price}
+      `
     }
   },
 

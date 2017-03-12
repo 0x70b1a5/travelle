@@ -56,6 +56,7 @@ export default React.createClass({
               </select></p>
               <p><input className="form-control" type="datetime-local" name="departure"/></p>
               <p><input className="form-control" name="seats" type="number" min="1" max="12" placeholder="Seats available"/></p>
+              <p><input className="form-control" name="price" type="number" min="1" placeholder="Price (CA$) per passenger"/></p>
               <p><textarea className="form-control" name="address" placeholder="Address and directions to pickup location"/></p>
 
               {submit}

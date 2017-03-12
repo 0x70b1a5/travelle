@@ -10,7 +10,8 @@ export default React.createClass({
       'To',
       'Departure',
       'Passengers',
-      'Driver',
+      'Seats',
+      'Price',
       'Join'
       ],
       rows: [{
@@ -18,7 +19,8 @@ export default React.createClass({
         'to': "",
         'departure': "",
         'passengers': "",
-        'driver': "",
+        'seats': "",
+        'price': "",
         'join': ""
       }]
     }

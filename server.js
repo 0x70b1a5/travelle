@@ -224,19 +224,30 @@ app.post('/join/ride/:id', ensure.ensureLoggedIn(), (req, res) => {
       console.error(`UserUnauthorizedException: Driver cannot join ride:`, req.user, ride);
       res.sendStatus(403);
       return;
+    } else if (ride.seats == ride.passengers) {
+      console.error(`VehicleOverCapacityException: Car is full:`, ride);
+      res.sendStatus(403);
+      return;
     }
     var newList = ride.list;
     newList.push(req.user.email);
-    Ride.updateOne({id: ride.id},
+    Ride.findOneAndUpdate({id: ride.id},
     {$set: {list: newList, passengers: ++ride.passengers}}, (err, doc) => {
       assert.equal(err,null);
-      res.redirect('/rides/'+ride.id)
+      User.findOne({email: req.user.email}, (err, user) => {
+        var newRides = user.rides || [];
+        newRides.push(ride.id);
+        User.findOneAndUpdate({email: req.user.email},
+        {$set: {rides: newRides}}, (err, doc) => {
+          assert.equal(err, null);
+          var rideText = utils.ride.text(doc);
+          utils.mail.send(transporter, utils.mail.joinRide(rideText));
+          res.redirect('/rides/'+ride.id)
+        })
+      })
     })
   });
 });
-app.get('/ride/:id', (res, req) => {
-  // TOOD ride info api
-})
 app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)
   var start = Number(req.params.start)

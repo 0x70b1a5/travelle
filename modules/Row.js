@@ -12,7 +12,8 @@ export default React.createClass({
         <Cell theme={theme+" break-word"} data={cols.to} />
         <Cell theme={theme+" break-word"} data={cols.departure} />
         <Cell theme={theme+" break-word"} data={cols.passengers} />
-        <Cell theme={theme+" break-word"} data={cols.driver} />
+        <Cell theme={theme+" break-word"} data={cols.seats} />
+        <Cell theme={theme+" break-word"} data={"$"+cols.price} />
         <PopupCell ride={cols.id} />
       </tr>
     )
