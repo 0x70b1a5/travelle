@@ -36,7 +36,7 @@ export default React.createClass({
         ]
       } else {
         sessionLinks = [
-          { route: "/ride", text: "Browse Rides" },
+          { route: "/rides", text: "Browse Rides" },
           { route: "/profile", text: this.state.email },
           { route: "/logout", text: "Log out" }
         ]

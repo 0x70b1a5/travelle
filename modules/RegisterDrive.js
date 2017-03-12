@@ -11,8 +11,8 @@ export default React.createClass({
         <section>
           <div className="container">
             <div className="row">
-              <div className="col-md-4 col-md-offset-2">
-                <h3>Thanks for driving with Travelle.</h3>
+              <div className="col-md-4 col-md-offset-2 text-center">
+                <h3>Thanks for driving with Travelle. </h3>
                 <p className="text-center"><i className="fa fa-5x sr-icons">🚗</i></p>
                 <p>Please note all drivers are expected to follow our <a href="/code">Code of Conduct</a>.</p>
               </div>

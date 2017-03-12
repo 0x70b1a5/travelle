@@ -15,11 +15,12 @@ var Strategy = require('passport-local').Strategy;
 const session = require('express-session');
 import ensure from 'connect-ensure-login'
 const MongoStore = require('connect-mongo')(session);
-import axios from 'axios'
 import bcrypt from 'bcrypt'
 import md5 from 'md5'
 import nodemailer from 'nodemailer'
 var stripe = require("stripe")("sk_test_8PMWCmZQOMFXaPcXWwuA1Upu");
+import multer from 'multer'
+var upload = multer({ dest: './public/img/uploads/' })
 
 
 passport.use(new Strategy({
@@ -50,6 +51,7 @@ var DB, User, Ride;
 const app = express()
 app.use(compression())
 app.use(bodyParser.json())
+   .use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public'), {index: false}))
 app.use(session({
   secret: 's e c u r i t y',
@@ -59,7 +61,6 @@ app.use(session({
     url: 'mongodb://localhost:27017/rides'
   })
 }));
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 // app.use(favicon(__dirname + 'public/favicon.ico'))
@@ -73,7 +74,7 @@ passport.deserializeUser(function(email, done) {
 });
 
 
-var transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: { //TODO dedicated email addr
     user: process.env.NODEMAILER_EMAIL,
@@ -87,54 +88,57 @@ app.post('/login',
   function(req, res) {
     res.redirect('/profile'); // welcome screen?
   });
-app.post('/register', (req, res) => {
-  console.log(req.files);
-  if (utils.user.valid(req.body) && utils.file.valid(req.files.picture)) {
-    var hash = bcrypt.hashSync(req.body.password, 10),
-    newUser = {
-      name: req.body.name,
-      email: req.body.email,
-      password: hash,
-      status: req.body.status
-    };
-    console.log(newUser);
-    if (newUser.status == '0') { // 0 => rider, 1 => driver
-      // we're good
-    } else if (newUser.status == '1') {
-      newUser.car = req.body.car;
-      newUser.plate = req.body.plate;
-      newUser.lastCharge = new Date(0); // i.e. never
-      newUser.picture = req.files.picture;
-    } else {
-      console.error(`BadUserInfoException: User status is invalid: ${newUser}`);
-      res.redirect('/register');
-      return;
-    }
-    // create user in DB
-    User.insertOne(newUser, (err, rows) => {
-      assert.equal(err, null)
-    });
-    // send registration email
-    utils.mail.send(transporter, utils.mail.newUser(req.body.email));
-
-    res.redirect('/login')
-  } else {
-    console.error(`BadUserInfoException: User is invalid: ${req}`);
+app.post('/register', upload.single('picture'), (req, res, next) => {
+  if (!utils.user.valid(User, req.body)) {
+    console.error(`BadUserInfoException: User is invalid:`, req.body);
     res.redirect('/register')
+    return;
   }
+  if (!utils.file.valid(req.file)) {
+    console.error(`BadFileException: File is invalid:`, req.file);
+    res.redirect('/register')
+    return;
+  }
+  var hash = bcrypt.hashSync(req.body.password, 10),
+  newUser = {
+    name: req.body.name,
+    email: req.body.email,
+    password: hash,
+    status: req.body.status,
+    picture: req.file.path
+  };
+  if (newUser.status == '0') { // 0 => rider, 1 => driver
+    // we're good
+  } else if (newUser.status == '1') {
+    newUser.car = req.body.car;
+    newUser.plate = req.body.plate;
+    newUser.lastCharge = new Date(0); // i.e. never
+  } else {
+    console.error(`BadUserInfoException: User status is invalid: ${newUser}`);
+    res.redirect('/register');
+    return;
+  }
+  // create user in DB
+  User.insertOne(newUser, (err, rows) => {
+    assert.equal(err, null)
+  });
+  // send registration email
+  utils.mail.send(transporter, utils.mail.newUser(req.body.email));
+
+  res.redirect('/login')
 })
 app.get('/driver-subscribe', ensure.ensureLoggedIn()); // TODO ensure users who access this page are drivers!
 app.post('/save-stripe-token', (req, res) => {
   console.log("token: ", req.body);
   var email = req.body.email,
   userEmail = req.body.userEmail;
-  // Create a Customer
+  // create a Customer
   stripe.customers.create({
     email: email,
     source: req.body.id,
   }).then(customer => {
     console.log("customer: ", customer);
-    // Charge them
+    // charge them
     return stripe.charges.create({
       amount: 500,
       currency: "cad",
@@ -143,8 +147,7 @@ app.post('/save-stripe-token', (req, res) => {
     });
   }).then(charge => {
     console.log("charge:", charge);
-    // Use and save the charge info and save customer ID to
-    //   user's Travelle account.
+    // save customer ID to user's Travelle account.
     // we can't use the charge email in case they paid
     //   with a different email.
     User.findOneAndUpdate({email:userEmail}, {$set: {
@@ -182,10 +185,12 @@ app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
     !utils.ride.valid(ride)
   ) {
     res.redirect('/post');
-    return; // is this necessary?
+    return; // is this necessary? // Yes.
   }
-  ride.driver = req.user.name;
+  ride.driver = req.user.email;
   ride.passengers = 0;
+  ride.seats = Number(ride.seats);
+  ride.list = [];
   Ride.find().toArray((err, all) => {
     assert.equal(err, null);
     ride.id = md5(all.length).slice(0,6);
@@ -197,17 +202,29 @@ app.post('/post/ride', ensure.ensureLoggedIn(), (req,res) => {
   res.redirect('/rides');
 })
 app.post('/join/ride', ensure.ensureLoggedIn(), (req, res) => {
-  Ride.findOne({
-    // TODO
+  Ride.findOne({id: req.body.id}, (err, ride) => {
+    assert.equal(err,null);
+    if (ride.list.indexOf(req.user.email) !== -1 ||
+      req.user.email == ride.driver) {
+      // user is already on ride!
+      res.sendStatus(403);
+      return;
+    }
+    var newList = ride.list;
+    newList.push(req.user.email);
+    Ride.updateOne({id: ride.id},
+    {$set: {list: newList, passengers: ++ride.passengers}}, (err, doc) => {
+      assert.equal(err,null);
+      res.sendStatus(200);
+    })
   });
 })
 app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)
   var start = Number(req.params.start)
-  Ride.find()
-    .toArray((err, rows) => {
-      res.json(rows.slice(start,limit+start))
-    })
+  Ride.find().toArray((err, rows) => {
+    res.json(rows.slice(start,limit+start))
+  })
 })
 app.get('*', (req, res) => {
   match({ routes, location: req.url }, (err, redirect, props) => {
@@ -234,8 +251,8 @@ var PORT = process.env.PORT || 8080
 MongoClient.connect("mongodb://localhost:27017/rides", (err,db) => {
   assert.equal(null,err)
   DB = db;
-  User = db.collection('users');
-  Ride = db.collection('rides');
+  User = DB.collection('users');
+  Ride = DB.collection('rides');
   console.log("connected to mdb");
 
   app.listen(PORT, function() {

@@ -36,10 +36,10 @@ export default React.createClass({
       backButton = <a href="#hed"><button className="btn btn-md btn-primary" onClick={() => this.updateRides(-50)}>previous 50 rides</button></a>
     }
     var frwdButton = <a href="#hed"><button className="btn btn-md btn-primary" onClick={() => this.updateRides(50)}>next 50 rides</button></a>
-    var paginators = <div className={"paginators"}>
+    var paginators = <p className={"paginators"}>
       {frwdButton}
       {backButton}
-    </div>
+    </p>
 
     return (
       <div id="table">

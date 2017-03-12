@@ -13,15 +13,17 @@ const utils = {
   user: {
     default: {
       username: "Nobody",
-      email: "no@email.com"
+      email: "no@email.com",
+      picture: "public/img/uploads/nobody.jpg"
     },
-    parse: function(userJSON){
+    parse: userJSON => {
       return {
-        username: userJSON.username,
-        email: userJSON.email
+        name: userJSON.name,
+        email: userJSON.email,
+        picture: userJSON.picture
       }
     },
-    valid: function(userJSON) {
+    valid: (db, userJSON) => {
       if (userJSON === null ||
         userJSON === undefined ||
         userJSON === "" ||
@@ -31,12 +33,12 @@ const utils = {
         !userJSON.email ||
         userJSON.password !== userJSON.confirmPassword
       ) return false;
-      User.findOne({email:userJSON.email}).toArray((err,rows) => {
-        if (err || rows.length > 0) return false;
-      });
+      db.findOne({email: userJSON.email}, (err, res) => {
+        if (res !== null) return false;
+      })
       return true;
     },
-    isDriver: function(user) {
+    isDriver: user => {
       if (user.status != '1' ||
         !user.car ||
         !user.plate
@@ -49,12 +51,6 @@ const utils = {
       ) return false;
       return true;
     },
-    exists: email => {
-      User.findOne({email: email}, (err, res) => {
-        if (res) return true;
-      })
-      return false;
-    }
   },
 
   mail: {
@@ -110,10 +106,16 @@ const utils = {
 
   file: {
     valid: file => {
-      console.log(file);
-      if (file.size > MAX_FILESIZE ||
-        (file.type != 'image/png' || file.type != 'image/jpg')
-      ) return false;
+      if (!file) {
+        console.log("File does not exist");
+        return false;
+      } else if (file.size > MAX_FILESIZE) {
+        console.log("File is too large");
+        return false;
+      } else if (!(file.mimetype == 'image/png' || file.mimetype == 'image/jpg' || file.mimetype == 'image/jpeg')) {
+        console.log("File type not supported", file.mimetype);
+        return false;
+      }
       return true;
     }
   }
