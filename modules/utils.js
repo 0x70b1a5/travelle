@@ -113,7 +113,8 @@ const utils = {
         !rideJSON.departure || //TODO validate time > now
         !rideJSON.address ||
         !rideJSON.price ||
-        !rideJSON.seats
+        !rideJSON.seats ||
+        !rideJSON.email
       ) return false;
       return true;
     },

@@ -242,12 +242,14 @@ app.post('/join/ride/:id', ensure.ensureLoggedIn(), (req, res) => {
           assert.equal(err, null);
           var rideText = utils.ride.text(doc);
           utils.mail.send(transporter, utils.mail.joinRide(rideText));
-          res.redirect('/rides/'+ride.id)
+          // res.redirect('/rides/'+ride.id) TODO individual ride pages
+          res.redirect('/rides')
         })
       })
     })
   });
 });
+app.get('/rides/:id', ensure.ensureLoggedIn());
 app.get('/data/limit/:limit/start/:start', (req,res) => {
   var limit = Number(req.params.limit)
   var start = Number(req.params.start)

@@ -66,7 +66,7 @@ export default React.createClass({
                       <h2 className="section-heading">Simple and affordable rides from one city to the next.</h2>
                       <hr className="light"/>
                       <p className="text-faded">Book a ride with us in three clicks. Get riding today.</p>
-                      <a href="#services" className="page-scroll btn btn-default btn-xl sr-button">Book a ride</a>
+                      <a href="/rides" className="page-scroll btn btn-default btn-xl sr-button">Book a ride</a>
                   </div>
               </div>
           </div>
