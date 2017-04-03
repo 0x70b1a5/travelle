@@ -24,8 +24,8 @@ export default React.createClass({
   render(){
     var sessionLinks = [
       { route: "/drive", text: "Drive" },
-      { route: "/login", text: "Sign in" },
-      { route: "/register", text: "Register" }
+      { route: "/register", text: "Ride" },
+      { route: "/login", text: "Sign in" }
     ]
     if (this.state.loggedIn) {
       if (this.state.status == "1") {
