@@ -15,14 +15,16 @@ const utils = {
       name: "Nobody",
       email: "no@email.com",
       picture: "public/img/uploads/nobody.jpg",
-      status: '0'
+      status: '0',
+      rides: []
     },
     parse: userJSON => { // ensures no unwanted info leakage
       return {
         name: userJSON.name,
         email: userJSON.email,
         picture: userJSON.picture,
-        status: userJSON.status
+        status: userJSON.status,
+        rides: userJSON.rides
       }
     },
     valid: (db, userJSON) => {
@@ -61,8 +63,14 @@ const utils = {
         from: '"Travelle" <go@travelle.com>',
         to: email,
         subject: 'Welcome to Travelle',
-        text: 'Thanks for signing up to ride with Travelle. We look forward to having you with us. If you have any questions, please reach out: contact@travelle.com',
-        html: 'Thanks for signing up to ride with Travelle. We look forward to having you with us. If you have any questions, please reach out: contact@travelle.com'
+        text: 'Thanks for signing up to ride with Travelle. We look forward to having you with us. \n\
+          You may access your profile here: http://travelle.ca/profile \n\
+          You may sign up for rides here: http://travelle.ca/rides \n\
+          If you have any questions, please reach out: contact@travelle.com',
+        html: 'Thanks for signing up to ride with Travelle. We look forward to having you with us. \n\
+          You may access your profile here: http://travelle.ca/profile \n\
+          You may sign up for rides here: http://travelle.ca/rides \n\
+          If you have any questions, please reach out: contact@travelle.com'
       }
     },
     newRide: email => {//TODO ride link, detail info
@@ -81,8 +89,12 @@ const utils = {
         to: email,
         bcc: "ops@getpaidtodrive.net",
         subject: 'Travelle: Verification Complete',
-        text: "Congratulations! You have been verified to drive. If you have any questions, please reach out: contact@travelle.com",
-        html: "Congratulations! You have been verified to drive. If you have any questions, please reach out: contact@travelle.com"
+        text: "Congratulations! You have been verified to drive. \n\
+          Update your profile here: http://travelle.ca/profile \n\
+          If you have any questions, please reach out: contact@travelle.com",
+        html: "Congratulations! You have been verified to drive. \n\
+          Update your profile here: http://travelle.ca/profile \n\
+          If you have any questions, please reach out: contact@travelle.com"
       }
     },
     joinRide: (email, ride) => {

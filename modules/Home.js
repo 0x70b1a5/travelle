@@ -96,7 +96,7 @@ export default React.createClass({
                   </div>
                   <div className="col-lg-4 text-center">
                       <i className="fa fa-envelope-o fa-3x sr-contact"></i>
-                      <p><a href="mailto:contact@travelle.com">contact@travelle.com</a></p>
+                      <p><a href="mailto:ops@getpaidtodrive.net">ops@getpaidtodrive.net</a></p>
                   </div>
               </div>
           </div>

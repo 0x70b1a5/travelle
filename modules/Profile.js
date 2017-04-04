@@ -17,7 +17,14 @@ export default React.createClass({
     })
   },
   render(){
-    // TODO add list of current rides
+    var rides = [];
+    if (this.state.user.rides && this.state.user.rides.length > 0) {
+      for (let ride of this.state.user.rides) {
+        let rideEl = <li key={ride}><a href={"/rides/"+ride}>Ride #{ride}</a></li>
+        rides.push(rideEl);
+      }
+    }
+    console.log(rides);
     return (
       <div>
         <br/>
@@ -28,6 +35,8 @@ export default React.createClass({
           <div className="container">
             <UserInfo user={this.state.user} />
             <p>Your account email: {this.state.user.email}</p>
+            <h2>Current rides:</h2>
+            {rides}
           </div>
         </section>
       </div>
